@@ -37,17 +37,130 @@
 
     <!-- Haunted houses -->
     <div class="house house-left">
-        <img src="assets/house-left.png" alt="" aria-hidden="true">
-        <div class="window-glow w1"></div>
-        <div class="window-glow w2"></div>
-        <div class="window-glow w3"></div>
+        <svg class="house-svg" viewBox="0 0 320 480" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ground Hill -->
+          <path class="house-path ground" d="M -10,480 Q 80,450 160,465 T 330,440 L 330,480 L -10,480 Z" />
+          
+          <!-- House Base & Structure -->
+          <path class="house-path structure" d="M 65,460 L 65,340 L 60,340 L 95,260 L 130,340 L 125,340 L 125,460 Z" />
+          <path class="house-path structure" d="M 125,460 L 125,270 L 120,270 L 165,190 L 210,270 L 205,270 L 205,460 Z" />
+          <path class="house-path structure" d="M 205,460 L 205,200 L 200,200 L 235,70 L 270,200 L 265,200 L 265,460 Z" />
+          
+          <!-- Dormer Roof -->
+          <path class="house-path roof-detail" d="M 140,270 L 165,230 L 190,270 Z" />
+          
+          <!-- Porch Roof & Columns -->
+          <path class="house-path porch" d="M 130,380 L 165,350 L 200,380 Z" />
+          <path class="house-path porch-column" d="M 140,380 L 140,460" />
+          <path class="house-path porch-column" d="M 190,380 L 190,460" />
+          <path class="house-path steps" d="M 145,460 L 185,460 M 148,465 L 182,465 M 151,470 L 179,470" />
+          
+          <!-- Chimney -->
+          <path class="house-path chimney" d="M 80,290 L 80,230 L 92,230 L 92,265" />
+          <path class="house-path chimney-top" d="M 77,230 L 95,230 L 95,224 L 77,224 Z" />
+          
+          <!-- Spire Finials (spikes/crosses) -->
+          <path class="house-path finial" d="M 235,70 L 235,45 M 230,53 L 240,53" />
+          <path class="house-path finial" d="M 165,190 L 165,175" />
+          <path class="house-path finial" d="M 95,260 L 95,248" />
+
+          <!-- Shading & Architectural Lines -->
+          <path class="house-path shading" d="M 75,310 L 85,310 M 105,310 L 115,310 M 90,290 L 100,290" />
+          <path class="house-path shading" d="M 145,230 L 155,230 M 175,230 L 185,230 M 155,210 L 175,210" />
+          <path class="house-path shading" d="M 220,160 L 230,160 M 240,160 L 250,160 M 225,120 L 245,120" />
+          <path class="house-path shading" d="M 145,365 L 155,365 M 175,365 L 185,365" />
+          <path class="house-path shading" d="M 70,430 L 120,430 M 70,400 L 120,400 M 70,370 L 120,370" />
+          <path class="house-path shading" d="M 210,430 L 260,430 M 210,400 L 260,400 M 210,370 L 260,370" />
+          <path class="house-path shading" d="M 125,325 L 205,325 M 125,295 L 205,295" />
+          <path class="house-path shading" d="M 100,350 L 105,365 L 102,372 L 108,385" />
+          
+          <!-- Windows -->
+          <path class="house-window w1" d="M 85,360 A 10,10 0 0,1 105,360 L 105,395 L 85,395 Z" />
+          <path class="house-window w2" d="M 152,285 A 13,13 0 0,1 178,285 L 178,315 L 152,315 Z" />
+          <path class="house-window w3" d="M 227,130 A 8,8 0 0,1 243,130 L 243,155 L 227,155 Z" />
+          <path class="house-window w4" d="M 225,360 A 10,10 0 0,1 245,360 L 245,395 L 225,395 Z" />
+          <path class="house-window w5" d="M 157,245 A 8,8 0 0,1 173,245 L 173,265 L 157,265 Z" />
+          
+          <!-- Gnarled Dead Tree -->
+          <path class="house-path tree trunk" d="M 10,465 Q 25,430 22,380 T 10,300 T 5,230" />
+          <path class="house-path tree-branch" d="M 20,385 Q 0,360 -5,320 T 5,270" />
+          <path class="house-path tree-branch" d="M -2,335 Q -15,310 -10,290" />
+          <path class="house-path tree-branch" d="M 18,340 Q 45,310 50,270 T 35,220" />
+          <path class="house-path tree-branch" d="M 40,295 Q 52,285 52,275" />
+          <path class="house-path tree-branch" d="M 11,280 Q 25,240 18,190 T -2,140" />
+          <path class="house-path tree-branch" d="M 14,215 Q 5,190 8,175" />
+
+          <!-- Spiked Fence -->
+          <path class="house-path fence-rail" d="M 260,450 L 330,445 M 260,438 L 330,433" />
+          <path class="house-path fence-picket" d="M 270,460 L 270,425 M 267,425 L 270,418 L 273,425 Z" />
+          <path class="house-path fence-picket" d="M 285,458 L 285,423 M 282,423 L 285,416 L 288,423 Z" />
+          <path class="house-path fence-picket" d="M 300,456 L 300,421 M 297,421 L 300,414 L 303,421 Z" />
+          <path class="house-path fence-picket" d="M 315,454 L 315,419 M 312,419 L 315,412 L 318,419 Z" />
+        </svg>
         <div class="chimney-smoke"></div>
     </div>
     <div class="house house-right">
-        <img src="assets/house-right.png" alt="" aria-hidden="true">
-        <div class="window-glow w1"></div>
-        <div class="window-glow w2"></div>
-        <div class="window-glow w3"></div>
+        <!-- Reusing the same detailed SVG, will be flipped horizontally in CSS via scaleX(-1) -->
+        <svg class="house-svg" viewBox="0 0 320 480" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ground Hill -->
+          <path class="house-path ground" d="M -10,480 Q 80,450 160,465 T 330,440 L 330,480 L -10,480 Z" />
+          
+          <!-- House Base & Structure -->
+          <path class="house-path structure" d="M 65,460 L 65,340 L 60,340 L 95,260 L 130,340 L 125,340 L 125,460 Z" />
+          <path class="house-path structure" d="M 125,460 L 125,270 L 120,270 L 165,190 L 210,270 L 205,270 L 205,460 Z" />
+          <path class="house-path structure" d="M 205,460 L 205,200 L 200,200 L 235,70 L 270,200 L 265,200 L 265,460 Z" />
+          
+          <!-- Dormer Roof -->
+          <path class="house-path roof-detail" d="M 140,270 L 165,230 L 190,270 Z" />
+          
+          <!-- Porch Roof & Columns -->
+          <path class="house-path porch" d="M 130,380 L 165,350 L 200,380 Z" />
+          <path class="house-path porch-column" d="M 140,380 L 140,460" />
+          <path class="house-path porch-column" d="M 190,380 L 190,460" />
+          <path class="house-path steps" d="M 145,460 L 185,460 M 148,465 L 182,465 M 151,470 L 179,470" />
+          
+          <!-- Chimney -->
+          <path class="house-path chimney" d="M 80,290 L 80,230 L 92,230 L 92,265" />
+          <path class="house-path chimney-top" d="M 77,230 L 95,230 L 95,224 L 77,224 Z" />
+          
+          <!-- Spire Finials (spikes/crosses) -->
+          <path class="house-path finial" d="M 235,70 L 235,45 M 230,53 L 240,53" />
+          <path class="house-path finial" d="M 165,190 L 165,175" />
+          <path class="house-path finial" d="M 95,260 L 95,248" />
+
+          <!-- Shading & Architectural Lines -->
+          <path class="house-path shading" d="M 75,310 L 85,310 M 105,310 L 115,310 M 90,290 L 100,290" />
+          <path class="house-path shading" d="M 145,230 L 155,230 M 175,230 L 185,230 M 155,210 L 175,210" />
+          <path class="house-path shading" d="M 220,160 L 230,160 M 240,160 L 250,160 M 225,120 L 245,120" />
+          <path class="house-path shading" d="M 145,365 L 155,365 M 175,365 L 185,365" />
+          <path class="house-path shading" d="M 70,430 L 120,430 M 70,400 L 120,400 M 70,370 L 120,370" />
+          <path class="house-path shading" d="M 210,430 L 260,430 M 210,400 L 260,400 M 210,370 L 260,370" />
+          <path class="house-path shading" d="M 125,325 L 205,325 M 125,295 L 205,295" />
+          <path class="house-path shading" d="M 100,350 L 105,365 L 102,372 L 108,385" />
+          
+          <!-- Windows -->
+          <path class="house-window w1" d="M 85,360 A 10,10 0 0,1 105,360 L 105,395 L 85,395 Z" />
+          <path class="house-window w2" d="M 152,285 A 13,13 0 0,1 178,285 L 178,315 L 152,315 Z" />
+          <path class="house-window w3" d="M 227,130 A 8,8 0 0,1 243,130 L 243,155 L 227,155 Z" />
+          <path class="house-window w4" d="M 225,360 A 10,10 0 0,1 245,360 L 245,395 L 225,395 Z" />
+          <path class="house-window w5" d="M 157,245 A 8,8 0 0,1 173,245 L 173,265 L 157,265 Z" />
+          
+          <!-- Gnarled Dead Tree -->
+          <path class="house-path tree trunk" d="M 10,465 Q 25,430 22,380 T 10,300 T 5,230" />
+          <path class="house-path tree-branch" d="M 20,385 Q 0,360 -5,320 T 5,270" />
+          <path class="house-path tree-branch" d="M -2,335 Q -15,310 -10,290" />
+          <path class="house-path tree-branch" d="M 18,340 Q 45,310 50,270 T 35,220" />
+          <path class="house-path tree-branch" d="M 40,295 Q 52,285 52,275" />
+          <path class="house-path tree-branch" d="M 11,280 Q 25,240 18,190 T -2,140" />
+          <path class="house-path tree-branch" d="M 14,215 Q 5,190 8,175" />
+
+          <!-- Spiked Fence -->
+          <path class="house-path fence-rail" d="M 260,450 L 330,445 M 260,438 L 330,433" />
+          <path class="house-path fence-picket" d="M 270,460 L 270,425 M 267,425 L 270,418 L 273,425 Z" />
+          <path class="house-path fence-picket" d="M 285,458 L 285,423 M 282,423 L 285,416 L 288,423 Z" />
+          <path class="house-path fence-picket" d="M 300,456 L 300,421 M 297,421 L 300,414 L 303,421 Z" />
+          <path class="house-path fence-picket" d="M 315,454 L 315,419 M 312,419 L 315,412 L 318,419 Z" />
+        </svg>
         <div class="chimney-smoke"></div>
     </div>
 

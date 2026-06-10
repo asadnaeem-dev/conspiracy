@@ -39,6 +39,7 @@
         setupParticles();
         setupLightning();
         setupAmbientSound();
+        setupHouseAnimations();
         setupEventListeners();
     }
 
@@ -406,6 +407,65 @@
         // Hide export card again
         exportCard.style.left = '-9999px';
         exportCard.style.position = 'fixed';
+    }
+
+    // --- House Pen-Stroke Animations ---
+    function setupHouseAnimations() {
+        const houses = document.querySelectorAll('.house');
+        
+        houses.forEach((house) => {
+            const paths = house.querySelectorAll('.house-svg path');
+            
+            paths.forEach((path) => {
+                const length = path.getTotalLength();
+                path.style.strokeDasharray = length;
+                path.style.strokeDashoffset = length;
+                
+                // Set animation parameters based on path categories for hand-sketched staggering
+                let delay = 0.2;
+                let duration = 3.0;
+                
+                if (path.classList.contains('ground')) {
+                    delay = 0.2;
+                    duration = 1.2;
+                } else if (path.classList.contains('structure')) {
+                    delay = 1.0;
+                    duration = 2.2;
+                } else if (path.classList.contains('roof-detail') || path.classList.contains('chimney') || path.classList.contains('porch')) {
+                    delay = 1.8;
+                    duration = 1.8;
+                } else if (path.classList.contains('shading') || path.classList.contains('finial')) {
+                    delay = 2.6;
+                    duration = 1.2;
+                } else if (path.classList.contains('house-window')) {
+                    delay = 2.8;
+                    duration = 1.0;
+                } else if (path.classList.contains('tree') || path.classList.contains('tree-branch')) {
+                    delay = 1.4;
+                    duration = 2.6;
+                } else if (path.classList.contains('fence-rail') || path.classList.contains('fence-picket')) {
+                    delay = 2.2;
+                    duration = 1.6;
+                }
+                
+                path.style.transition = `stroke-dashoffset ${duration}s cubic-bezier(0.4, 0, 0.2, 1) ${delay}s, opacity ${duration}s ease ${delay}s`;
+            });
+        });
+
+        // Trigger the drawing after rendering has caught up
+        setTimeout(() => {
+            houses.forEach((house) => {
+                const paths = house.querySelectorAll('.house-svg path');
+                paths.forEach((path) => {
+                    path.style.strokeDashoffset = '0';
+                });
+                
+                // Once drawing transition is finished, active fills and glows
+                setTimeout(() => {
+                    house.classList.add('active');
+                }, 4000);
+            });
+        }, 150);
     }
 
     // --- Start ---

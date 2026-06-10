@@ -226,91 +226,176 @@ body::after {
 /* --- Haunted Houses --- */
 .house {
     position: fixed;
-    bottom: 0;
+    bottom: -10px;
     z-index: 4;
     pointer-events: none;
-}
-
-.house img {
     width: 320px;
-    height: auto;
-    filter: brightness(0.7) contrast(1.2);
-    animation: house-sway 8s ease-in-out infinite;
+    height: 480px;
 }
 
 .house-left {
-    left: -30px;
-}
-
-.house-left img {
-    animation-delay: 0s;
+    left: -35px;
 }
 
 .house-right {
-    right: -30px;
+    right: -35px;
 }
 
-.house-right img {
+.house-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Left house sway */
+.house-left .house-svg {
+    animation: house-sway-left 12s ease-in-out infinite alternate;
+}
+
+@keyframes house-sway-left {
+    0% { transform: rotate(-0.5deg); }
+    100% { transform: rotate(0.5deg); }
+}
+
+/* Right house sway (mirrored) */
+.house-right .house-svg {
     transform: scaleX(-1);
-    animation-delay: -4s;
-}
-
-@keyframes house-sway {
-    0%, 100% { transform: rotate(-0.3deg); }
-    50% { transform: rotate(0.3deg); }
-}
-
-.house-right img {
-    animation-name: house-sway-right;
+    transform-origin: center;
+    animation: house-sway-right 12s ease-in-out infinite alternate;
 }
 
 @keyframes house-sway-right {
-    0%, 100% { transform: scaleX(-1) rotate(-0.3deg); }
-    50% { transform: scaleX(-1) rotate(0.3deg); }
+    0% { transform: scaleX(-1) rotate(-0.5deg); }
+    100% { transform: scaleX(-1) rotate(0.5deg); }
 }
 
-/* Window glow */
-.window-glow {
-    position: absolute;
-    width: 12px;
-    height: 14px;
-    background: var(--gold);
-    border-radius: 2px;
-    box-shadow: 0 0 8px var(--gold), 0 0 20px rgba(201, 168, 76, 0.3);
-    animation: window-flicker 3s ease-in-out infinite;
+/* SVG Line Drawing Styles */
+.house-path {
+    fill: transparent;
+    stroke: var(--gold);
+    stroke-width: 1.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: fill 2s ease-out, stroke 2.5s ease, stroke-width 2s ease;
+}
+
+/* Gnarled tree trunk is slightly thicker */
+.house-path.trunk {
+    stroke-width: 2.2px;
+}
+
+/* Shading lines are thinner and dimmer */
+.house-path.shading {
+    stroke-width: 0.8px;
+    stroke: var(--text-dim);
     opacity: 0.7;
 }
 
-.house-left .w1 { bottom: 45%; left: 35%; animation-delay: 0s; }
-.house-left .w2 { bottom: 55%; left: 50%; animation-delay: -1.5s; }
-.house-left .w3 { bottom: 35%; left: 55%; animation-delay: -0.8s; }
-
-.house-right .w1 { bottom: 45%; right: 35%; animation-delay: -0.5s; }
-.house-right .w2 { bottom: 55%; right: 50%; animation-delay: -2s; }
-.house-right .w3 { bottom: 35%; right: 55%; animation-delay: -1.2s; }
-
-@keyframes window-flicker {
-    0%, 100% { opacity: 0.7; }
-    20% { opacity: 0.3; }
-    40% { opacity: 0.8; }
-    60% { opacity: 0.5; }
-    80% { opacity: 0.9; }
+/* Fence lines */
+.house-path.fence-rail,
+.house-path.fence-picket {
+    stroke-width: 1.2px;
 }
 
-/* Chimney smoke */
+/* Windows (drawn with lines first) */
+.house-window {
+    fill: transparent;
+    stroke: var(--gold);
+    stroke-width: 1.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.9;
+    transition: fill 2s ease-out, filter 2s ease-out;
+}
+
+/* Fills and glows fade in when the drawing completes (.active class added by JS) */
+.house.active .house-path.structure,
+.house.active .house-path.roof-detail,
+.house.active .house-path.porch,
+.house.active .house-path.chimney,
+.house.active .house-path.chimney-top,
+.house.active .house-path.ground {
+    fill: rgba(10, 8, 16, 0.94); /* Rich deep purple-black gothic silhouette fill */
+    stroke: rgba(201, 168, 76, 0.45); /* Subtle dim gold outline */
+    stroke-width: 1.2px;
+}
+
+.house.active .house-path.tree {
+    fill: rgba(8, 6, 12, 0.95);
+    stroke: rgba(201, 168, 76, 0.35);
+}
+
+.house.active .house-path.fence-rail,
+.house.active .house-path.fence-picket {
+    stroke: rgba(201, 168, 76, 0.4);
+}
+
+/* Windows light up and flicker when active */
+.house.active .house-window {
+    fill: var(--gold);
+    stroke: var(--gold);
+    filter: drop-shadow(0 0 6px var(--gold));
+    animation: window-flicker-svg 3.5s ease-in-out infinite;
+}
+
+/* Stagger window flickers */
+.house.active .house-window.w1 { animation-delay: 0s; }
+.house.active .house-window.w2 { animation-delay: -1.5s; }
+.house.active .house-window.w3 { animation-delay: -0.7s; }
+.house.active .house-window.w4 { animation-delay: -2.2s; }
+.house.active .house-window.w5 { animation-delay: -0.3s; }
+
+@keyframes window-flicker-svg {
+    0%, 100% {
+        opacity: 0.9;
+        filter: drop-shadow(0 0 5px var(--gold));
+    }
+    15% {
+        opacity: 0.35;
+        filter: drop-shadow(0 0 1px rgba(201, 168, 76, 0.2));
+    }
+    30% {
+        opacity: 0.8;
+        filter: drop-shadow(0 0 4px var(--gold));
+    }
+    45% {
+        opacity: 0.2;
+        filter: drop-shadow(0 0 1px rgba(201, 168, 76, 0.1));
+    }
+    55% {
+        opacity: 0.95;
+        filter: drop-shadow(0 0 6px var(--gold));
+    }
+    75% {
+        opacity: 0.5;
+        filter: drop-shadow(0 0 3px rgba(201, 168, 76, 0.3));
+    }
+    90% {
+        opacity: 0.85;
+        filter: drop-shadow(0 0 5px var(--gold));
+    }
+}
+
+/* Chimney smoke active toggle */
 .chimney-smoke {
     position: absolute;
-    top: 10%;
+    top: 45%; /* aligned with chimney top coordinate */
     width: 30px;
     height: 60px;
+    opacity: 0;
+    transition: opacity 3s ease;
 }
 
 .house-left .chimney-smoke {
-    left: 45%;
+    left: 27%; /* aligned with chimney top coordinate (86px / 320px) */
 }
 
 .house-right .chimney-smoke {
-    right: 45%;
+    right: 27%; /* mirrored aligned with chimney top coordinate */
+}
+
+.house.active .chimney-smoke {
+    opacity: 1;
 }
 
 .chimney-smoke::before,
@@ -319,7 +404,7 @@ body::after {
     position: absolute;
     width: 20px;
     height: 20px;
-    background: radial-gradient(circle, rgba(100, 80, 120, 0.3), transparent);
+    background: radial-gradient(circle, rgba(140, 120, 160, 0.4), transparent);
     border-radius: 50%;
     animation: smoke-rise 4s ease-out infinite;
 }
