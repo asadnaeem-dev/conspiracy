@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Conspiracy Oracle — Unveil The Hidden Truth</title>
+    <meta name="description" content="Enter a single word and let the ancient Conspiracy Oracle reveal its darkest secrets. AI-powered conspiracy theory generator with a spooky, mystical atmosphere.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+    
+    <!-- html2canvas for share-as-image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Ambient sound toggle -->
+    <button id="sound-toggle" class="sound-toggle" aria-label="Toggle ambient sound">
+        <span class="sound-icon">🔊</span>
+    </button>
+
+    <!-- Lightning flash overlay -->
+    <div id="lightning-overlay" class="lightning-overlay"></div>
+
+    <!-- Fog layers -->
+    <div class="fog-container">
+        <div class="fog fog-1"></div>
+        <div class="fog fog-2"></div>
+        <div class="fog fog-3"></div>
+    </div>
+
+    <!-- Floating particles -->
+    <div id="particles" class="particles"></div>
+
+    <!-- Haunted houses -->
+    <div class="house house-left">
+        <img src="assets/house-left.png" alt="" aria-hidden="true">
+        <div class="window-glow w1"></div>
+        <div class="window-glow w2"></div>
+        <div class="window-glow w3"></div>
+        <div class="chimney-smoke"></div>
+    </div>
+    <div class="house house-right">
+        <img src="assets/house-right.png" alt="" aria-hidden="true">
+        <div class="window-glow w1"></div>
+        <div class="window-glow w2"></div>
+        <div class="window-glow w3"></div>
+        <div class="chimney-smoke"></div>
+    </div>
+
+    <!-- Bats container (populated by JS) -->
+    <div id="bats-container" class="bats-container"></div>
+
+    <!-- Main content -->
+    <main class="main-content">
+        <!-- Title -->
+        <header class="header">
+            <div class="candle-left">🕯️</div>
+            <h1 id="main-title" class="title">
+                <span class="title-the">The</span>
+                <span class="title-main">Conspiracy Oracle</span>
+            </h1>
+            <div class="candle-right">🕯️</div>
+        </header>
+
+        <p class="subtitle">Speak a word, and the Oracle shall reveal what <em>they</em> don't want you to know.</p>
+
+        <!-- Input area -->
+        <div class="oracle-input-container">
+            <div class="crystal-ball-wrapper">
+                <div class="crystal-ball-glow"></div>
+                <div class="crystal-ball" id="crystal-ball">
+                    <div class="crystal-inner">
+                        <div class="crystal-swirl"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="word-input" 
+                    class="word-input" 
+                    placeholder="Enter a word..." 
+                    maxlength="30"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <button id="generate-btn" class="generate-btn">
+                    <span class="btn-text">Consult the Oracle</span>
+                    <span class="btn-loading" hidden>
+                        <span class="loading-eye">👁️</span>
+                        <span>The Oracle sees...</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Theory card -->
+        <section id="theory-section" class="theory-section" hidden>
+            <div id="theory-card" class="theory-card">
+                <div class="card-border-glow"></div>
+                <div class="card-inner">
+                    <div class="card-header">
+                        <span class="eye-icon">👁️</span>
+                        <h2 id="theory-word" class="theory-word"></h2>
+                        <span class="eye-icon">👁️</span>
+                    </div>
+                    <div class="card-divider">
+                        <span>⟡</span><span>───────</span><span>⟡</span>
+                    </div>
+                    <p id="theory-text" class="theory-text"></p>
+                    <div class="card-footer">
+                        <div class="plausibility">
+                            <span class="plausibility-label">Plausibility Rating:</span>
+                            <span id="plausibility-value" class="plausibility-value"></span>
+                        </div>
+                        <button id="share-btn" class="share-btn">
+                            <span>📤</span> Share as Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hidden card for clean image export -->
+        <div id="export-card" class="export-card" aria-hidden="true">
+            <div class="export-inner">
+                <h2 class="export-title">THE CONSPIRACY ORACLE</h2>
+                <div class="export-divider">⟡ ─────── ⟡</div>
+                <h3 id="export-word" class="export-word"></h3>
+                <p id="export-text" class="export-text"></p>
+                <div class="export-footer">
+                    <span id="export-plausibility" class="export-plausibility"></span>
+                    <span class="export-watermark">conspiracy-oracle.vercel.app</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>The Oracle speaks in riddles. <span class="footer-dim">All theories are AI-generated fiction.</span></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
