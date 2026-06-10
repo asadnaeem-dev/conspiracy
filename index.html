@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Conspiracy Oracle — Unveil The Hidden Truth</title>
-    <meta name="description" content="Enter a single word and let the ancient Conspiracy Oracle reveal its darkest secrets. AI-powered conspiracy theory generator with a spooky, mystical atmosphere.">
+    <title>Classified Dossier Archive — Decryption Interface</title>
+    <meta name="description" content="Enter any keyword to decrypt classified anomaly files and reveal forbidden, redacted records from the hidden database.">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +17,11 @@
     <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
+    <!-- Cinematic Intro Overlays -->
+    <div id="cinematic-curtain" class="cinematic-curtain"></div>
+    <div id="crt-flicker" class="crt-flicker"></div>
+    <div id="film-grain" class="film-grain"></div>
+
     <!-- Ambient sound toggle -->
     <button id="sound-toggle" class="sound-toggle" aria-label="Toggle ambient sound">
         <span class="sound-icon">🔊</span>
@@ -38,6 +43,9 @@
     <!-- Haunted houses -->
     <div class="house house-left">
         <svg class="house-svg" viewBox="0 0 320 480" xmlns="http://www.w3.org/2000/svg">
+          <!-- Moonlight Silhouette Background -->
+          <circle class="house-path moon-glow" cx="165" cy="200" r="110" />
+
           <!-- Ground Hill -->
           <path class="house-path ground" d="M -10,480 Q 80,450 160,465 T 330,440 L 330,480 L -10,480 Z" />
           
@@ -102,6 +110,9 @@
     <div class="house house-right">
         <!-- Reusing the same detailed SVG, will be flipped horizontally in CSS via scaleX(-1) -->
         <svg class="house-svg" viewBox="0 0 320 480" xmlns="http://www.w3.org/2000/svg">
+          <!-- Moonlight Background -->
+          <circle class="house-path moon-glow" cx="165" cy="200" r="110" />
+
           <!-- Ground Hill -->
           <path class="house-path ground" d="M -10,480 Q 80,450 160,465 T 330,440 L 330,480 L -10,480 Z" />
           
@@ -171,12 +182,12 @@
     <main class="main-content">
         <header class="header">
             <h1 id="main-title" class="title">
-                <span class="title-the">The</span>
-                <span class="title-main">Conspiracy Oracle</span>
+                <span class="title-the">CLASSIFIED</span>
+                <span class="title-main">DOSSIER ARCHIVE</span>
             </h1>
         </header>
 
-        <p class="subtitle">Speak a word, and the Oracle shall reveal what <em>they</em> don't want you to know.</p>
+        <p class="subtitle">Enter keyword to decrypt restricted anomaly files from the hidden database.</p>
 
         <!-- Input area -->
         <div class="oracle-input-container">
@@ -199,10 +210,10 @@
                     spellcheck="false"
                 >
                 <button id="generate-btn" class="generate-btn">
-                    <span class="btn-text">Consult the Oracle</span>
+                    <span class="btn-text">Decrypt Dossier</span>
                     <span class="btn-loading" style="display:none">
                         <span class="loading-eye">👁️</span>
-                        <span>The Oracle sees...</span>
+                        <span>Decrypting Archive...</span>
                     </span>
                 </button>
             </div>
@@ -223,17 +234,12 @@
                     </div>
                     <p id="theory-text" class="theory-text"></p>
                     <div class="card-footer">
-                        <div class="plausibility">
-                            <div class="plausibility-header">
-                                <span class="plausibility-label">Forbidden Truth Level:</span>
-                                <span id="plausibility-value" class="plausibility-value">0%</span>
-                            </div>
-                            <div class="plausibility-bar-container">
-                                <div id="plausibility-bar" class="plausibility-bar"></div>
-                            </div>
+                        <div class="classification-container">
+                            <span class="classification-label">DOSSIER STATUS:</span>
+                            <span id="classification-value" class="classification-value">ARCHIVED FILE</span>
                         </div>
                         <button id="share-btn" class="share-btn">
-                            <span>📤</span> Share as Image
+                            <span>📤</span> Share Evidence
                         </button>
                     </div>
                 </div>
@@ -257,7 +263,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>The Oracle speaks in riddles. <span class="footer-dim">All theories are AI-generated fiction.</span></p>
+        <p>Warning: Accessing unauthorized dossiers. <span class="footer-dim">All records are AI-generated fiction.</span></p>
     </footer>
 
     <script src="script.js?v=4"></script>

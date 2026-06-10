@@ -14,7 +14,7 @@
     const theorySection = document.getElementById('theory-section');
     const theoryWord = document.getElementById('theory-word');
     const theoryText = document.getElementById('theory-text');
-    const plausibilityValue = document.getElementById('plausibility-value');
+    const classificationValue = document.getElementById('classification-value');
     const shareBtn = document.getElementById('share-btn');
     const soundToggle = document.getElementById('sound-toggle');
     const soundIcon = soundToggle.querySelector('.sound-icon');
@@ -41,6 +41,15 @@
         setupAmbientSound();
         setupHouseAnimations();
         setupEventListeners();
+
+        // Fade out cinematic curtain on load
+        setTimeout(() => {
+            const curtain = document.getElementById('cinematic-curtain');
+            if (curtain) {
+                curtain.style.opacity = '0';
+                setTimeout(() => curtain.style.display = 'none', 3500);
+            }
+        }, 500);
     }
 
     // --- Event Listeners ---
@@ -75,19 +84,27 @@
 
         try {
             const theory = await fetchTheory(word);
-            const plausibility = Math.floor(Math.random() * 18) + 1; // 1–18%
+            
+            // Random classification stamp
+            const classifications = [
+                'ARCHIVED FILE',
+                'REDACTED RECORD',
+                'UNSOLVED INCIDENT',
+                'RESTRICTED DOSSIER',
+                'ANOMALY REPORT',
+                'LOST TESTIMONY'
+            ];
+            const classification = classifications[Math.floor(Math.random() * classifications.length)];
 
             // Set card content
             theoryWord.textContent = word.toUpperCase();
-            plausibilityValue.textContent = '0%';
-            
-            // Get progress bar element
-            const plausibilityBar = document.getElementById('plausibility-bar');
-            plausibilityBar.style.width = '0%';
+            if (classificationValue) {
+                classificationValue.textContent = classification;
+            }
 
             // Export card
             exportWord.textContent = word.toUpperCase();
-            exportPlausibility.textContent = 'Forbidden Truth Level: ' + plausibility + '%';
+            exportPlausibility.textContent = 'Classification: ' + classification;
 
             // Show theory section
             theorySection.hidden = false;
@@ -103,9 +120,6 @@
             triggerLightning();
             playThunder();
 
-            // Animate plausibility meter first (Forbidden Truth Level)
-            await animatePlausibilityMeter(plausibility, plausibilityBar);
-
             // Then run typewriter effect for the theory text
             await typewriterEffect(theoryText, theory);
             exportText.textContent = theory;
@@ -113,11 +127,9 @@
         } catch (err) {
             theorySection.hidden = false;
             theoryWord.textContent = 'ERROR';
-            theoryText.textContent = 'The Oracle\'s vision is clouded... ' + (err.message || 'Please try again.');
+            theoryText.textContent = 'The decryption connection was lost... ' + (err.message || 'Please try again.');
             theoryText.classList.remove('typing');
-            plausibilityValue.textContent = '???';
-            const plausibilityBar = document.getElementById('plausibility-bar');
-            if (plausibilityBar) plausibilityBar.style.width = '0%';
+            if (classificationValue) classificationValue.textContent = 'ERROR';
         }
 
         // Reset UI
@@ -329,36 +341,7 @@
         }, 400);
     }
 
-    // --- Forbidden Truth Bar Animation ---
-    function animatePlausibilityMeter(targetVal, barElement) {
-        return new Promise((resolve) => {
-            let currentVal = 0;
-            const duration = 1200; // ms
-            const intervalTime = 30; // ms
-            const steps = duration / intervalTime;
-            const increment = targetVal / steps;
-            
-            const timer = setInterval(() => {
-                currentVal += increment;
-                if (currentVal >= targetVal) {
-                    currentVal = targetVal;
-                    clearInterval(timer);
-                    
-                    plausibilityValue.textContent = Math.round(currentVal) + '%';
-                    barElement.style.width = Math.round(currentVal) + '%';
-                    
-                    // Final confirmation tick
-                    playTick();
-                    
-                    setTimeout(resolve, 300); // short pause
-                } else {
-                    plausibilityValue.textContent = Math.round(currentVal) + '%';
-                    barElement.style.width = Math.round(currentVal) + '%';
-                    playTick();
-                }
-            }, intervalTime);
-        });
-    }
+
 
     // --- Particles ---
     function setupParticles() {
