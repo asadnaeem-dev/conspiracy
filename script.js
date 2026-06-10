@@ -51,6 +51,10 @@
         });
         shareBtn.addEventListener('click', handleShare);
         soundToggle.addEventListener('click', toggleSound);
+
+        // Mystical eye cursor hover response over interactive crystal ball
+        crystalBall.addEventListener('mouseenter', startWhisper);
+        crystalBall.addEventListener('mouseleave', stopWhisper);
     }
 
     // --- Generate Theory ---
@@ -75,11 +79,15 @@
 
             // Set card content
             theoryWord.textContent = word.toUpperCase();
-            plausibilityValue.textContent = plausibility + '%';
+            plausibilityValue.textContent = '0%';
+            
+            // Get progress bar element
+            const plausibilityBar = document.getElementById('plausibility-bar');
+            plausibilityBar.style.width = '0%';
 
             // Export card
             exportWord.textContent = word.toUpperCase();
-            exportPlausibility.textContent = 'Plausibility: ' + plausibility + '%';
+            exportPlausibility.textContent = 'Forbidden Truth Level: ' + plausibility + '%';
 
             // Show theory section
             theorySection.hidden = false;
@@ -88,15 +96,19 @@
             void theorySection.offsetHeight;
             theorySection.style.animation = '';
 
-            // Typewriter effect
-            await typewriterEffect(theoryText, theory);
-            exportText.textContent = theory;
-
             // Trigger bats
             spawnBats();
 
-            // Flash lightning
+            // Flash lightning + play thunder sound
             triggerLightning();
+            playThunder();
+
+            // Animate plausibility meter first (Forbidden Truth Level)
+            await animatePlausibilityMeter(plausibility, plausibilityBar);
+
+            // Then run typewriter effect for the theory text
+            await typewriterEffect(theoryText, theory);
+            exportText.textContent = theory;
 
         } catch (err) {
             theorySection.hidden = false;
@@ -104,6 +116,8 @@
             theoryText.textContent = 'The Oracle\'s vision is clouded... ' + (err.message || 'Please try again.');
             theoryText.classList.remove('typing');
             plausibilityValue.textContent = '???';
+            const plausibilityBar = document.getElementById('plausibility-bar');
+            if (plausibilityBar) plausibilityBar.style.width = '0%';
         }
 
         // Reset UI
@@ -204,6 +218,146 @@
         lightningOverlay.classList.remove('flash');
         void lightningOverlay.offsetHeight;
         lightningOverlay.classList.add('flash');
+
+        // Frantic house window flickering during lightning
+        const houses = document.querySelectorAll('.house');
+        houses.forEach(house => house.classList.add('lightning-flicker'));
+        
+        setTimeout(() => {
+            houses.forEach(house => house.classList.remove('lightning-flicker'));
+        }, 1200);
+    }
+
+    // --- Interactive Procedural Synth Effects ---
+    function playTick() {
+        if (!audioCtx || isMuted) return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+            // pitch drop for a natural mechanical click/tick sound
+            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.04);
+
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        } catch (e){}
+    }
+
+    let whisperNode = null;
+    let whisperGain = null;
+
+    function startWhisper() {
+        if (!audioCtx || isMuted) return;
+        try {
+            stopWhisper();
+
+            whisperGain = audioCtx.createGain();
+            whisperGain.gain.setValueAtTime(0, audioCtx.currentTime);
+            // fade in ghostly whisper
+            whisperGain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.5);
+
+            // Generate noise buffer
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.loop = true;
+
+            // Bandpass filter to create resonant ghostly sweeping noise
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.Q.value = 10;
+            filter.frequency.setValueAtTime(250, audioCtx.currentTime);
+
+            source.connect(filter);
+            filter.connect(whisperGain);
+            whisperGain.connect(audioCtx.destination);
+
+            source.start();
+            whisperNode = source;
+
+            // Start sweeping modulation
+            modulateWhisper(filter);
+        } catch (e) {
+            console.error('Whisper failed:', e);
+        }
+    }
+
+    function modulateWhisper(filterNode) {
+        if (!whisperNode || !audioCtx) return;
+        try {
+            const now = audioCtx.currentTime;
+            const nextFreq = 300 + Math.random() * 500;
+            const nextQ = 7 + Math.random() * 8;
+            filterNode.frequency.exponentialRampToValueAtTime(nextFreq, now + 1.2);
+            filterNode.Q.exponentialRampToValueAtTime(nextQ, now + 1.2);
+            
+            setTimeout(() => {
+                if (whisperNode) modulateWhisper(filterNode);
+            }, 1200);
+        } catch (e){}
+    }
+
+    function stopWhisper() {
+        if (whisperGain && audioCtx) {
+            try {
+                const now = audioCtx.currentTime;
+                whisperGain.gain.cancelScheduledValues(now);
+                whisperGain.gain.setValueAtTime(whisperGain.gain.value, now);
+                whisperGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+            } catch (e){}
+        }
+        setTimeout(() => {
+            if (whisperNode) {
+                try {
+                    whisperNode.stop();
+                } catch(e){}
+                whisperNode = null;
+            }
+        }, 400);
+    }
+
+    // --- Forbidden Truth Bar Animation ---
+    function animatePlausibilityMeter(targetVal, barElement) {
+        return new Promise((resolve) => {
+            let currentVal = 0;
+            const duration = 1200; // ms
+            const intervalTime = 30; // ms
+            const steps = duration / intervalTime;
+            const increment = targetVal / steps;
+            
+            const timer = setInterval(() => {
+                currentVal += increment;
+                if (currentVal >= targetVal) {
+                    currentVal = targetVal;
+                    clearInterval(timer);
+                    
+                    plausibilityValue.textContent = Math.round(currentVal) + '%';
+                    barElement.style.width = Math.round(currentVal) + '%';
+                    
+                    // Final confirmation tick
+                    playTick();
+                    
+                    setTimeout(resolve, 300); // short pause
+                } else {
+                    plausibilityValue.textContent = Math.round(currentVal) + '%';
+                    barElement.style.width = Math.round(currentVal) + '%';
+                    playTick();
+                }
+            }, intervalTime);
+        });
     }
 
     // --- Particles ---
