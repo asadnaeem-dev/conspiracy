@@ -36,20 +36,16 @@
 
     // --- Initialize ---
     function init() {
+        // Load mute state from localStorage
+        isMuted = localStorage.getItem('conspiracy_muted') === 'true';
+        soundToggle.classList.toggle('muted', isMuted);
+        soundIcon.textContent = isMuted ? '🔇' : '🔊';
+
         setupParticles();
         setupLightning();
         setupAmbientSound();
-        setupHouseAnimations();
+        initCastles();
         setupEventListeners();
-
-        // Fade out cinematic curtain on load
-        setTimeout(() => {
-            const curtain = document.getElementById('cinematic-curtain');
-            if (curtain) {
-                curtain.style.opacity = '0';
-                setTimeout(() => curtain.style.display = 'none', 3500);
-            }
-        }, 500);
     }
 
     // --- Event Listeners ---
@@ -64,6 +60,39 @@
         // Mystical eye cursor hover response over interactive crystal ball
         crystalBall.addEventListener('mouseenter', startWhisper);
         crystalBall.addEventListener('mouseleave', stopWhisper);
+
+        // Curtain reveal database click event
+        const curtain = document.getElementById('cinematic-curtain');
+        if (curtain) {
+            curtain.addEventListener('click', revealDatabase);
+        }
+    }
+
+    // --- Decryption Interface Reveal ---
+    function revealDatabase() {
+        const curtain = document.getElementById('cinematic-curtain');
+        if (!curtain || curtain.classList.contains('fading')) return;
+        
+        curtain.classList.add('fading');
+        
+        // 1. Initialize Web Audio Context
+        initAudio();
+        
+        // 2. Immediate heavy thunder clap and lightning flash
+        triggerLightning();
+        playThunder();
+        
+        // 3. Fade screen black overlay
+        curtain.style.opacity = '0';
+        document.body.classList.add('revealed');
+        
+        // 4. Clean up curtain element
+        setTimeout(() => {
+            curtain.style.display = 'none';
+        }, 3000);
+        
+        // 5. Start procedural pen-sketching drawing of castles
+        startCastleSketching();
     }
 
     // --- Generate Theory ---
@@ -359,14 +388,12 @@
     }
 
     // --- Ambient Sound (Web Audio API) ---
-    function setupAmbientSound() {
-        // Create audio on first user interaction (browser policy)
-        const startAudio = () => {
-            if (audioCtx) return;
-            
+    function initAudio() {
+        if (audioCtx) return;
+        try {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             ambientGain = audioCtx.createGain();
-            ambientGain.gain.value = 0.12;
+            ambientGain.gain.setValueAtTime(isMuted ? 0 : 0.12, audioCtx.currentTime);
             ambientGain.connect(audioCtx.destination);
 
             // Wind noise
@@ -374,7 +401,14 @@
             
             // Random thunder rumbles
             scheduleThunder();
+        } catch (e) {
+            console.error('Audio init failed:', e);
+        }
+    }
 
+    function setupAmbientSound() {
+        const startAudio = () => {
+            initAudio();
             document.removeEventListener('click', startAudio);
             document.removeEventListener('keydown', startAudio);
         };
@@ -420,13 +454,15 @@
     }
 
     function modulateWind(gainNode) {
-        if (!audioCtx || isMuted) return;
+        if (!audioCtx) return;
         
         const now = audioCtx.currentTime;
-        const nextVal = 0.06 + Math.random() * 0.1;
+        const nextVal = isMuted ? 0 : (0.06 + Math.random() * 0.1);
         const duration = 3 + Math.random() * 5;
         
-        gainNode.gain.setTargetAtTime(nextVal, now, duration);
+        try {
+            gainNode.gain.setTargetAtTime(nextVal, now, duration);
+        } catch (e) {}
         
         setTimeout(() => modulateWind(gainNode), (duration * 1000) + 500);
     }
@@ -486,6 +522,7 @@
 
     function toggleSound() {
         isMuted = !isMuted;
+        localStorage.setItem('conspiracy_muted', isMuted);
         soundToggle.classList.toggle('muted', isMuted);
         soundIcon.textContent = isMuted ? '🔇' : '🔊';
 
@@ -547,62 +584,168 @@
     }
 
     // --- House Pen-Stroke Animations ---
-    function setupHouseAnimations() {
+    function initCastles() {
         const houses = document.querySelectorAll('.house');
-        
         houses.forEach((house) => {
-            const paths = house.querySelectorAll('.house-svg path');
-            
+            const paths = house.querySelectorAll('.house-svg path, .house-svg circle');
             paths.forEach((path) => {
-                const length = path.getTotalLength();
+                let length = 0;
+                if (path.tagName === 'circle') {
+                    length = 2 * Math.PI * parseFloat(path.getAttribute('r') || 110);
+                } else {
+                    try {
+                        length = path.getTotalLength();
+                    } catch (e) {
+                        length = 300;
+                    }
+                }
+                path.setAttribute('data-length', length);
                 path.style.strokeDasharray = length;
                 path.style.strokeDashoffset = length;
-                
-                // Set animation parameters based on path categories for hand-sketched staggering
-                let delay = 0.2;
-                let duration = 3.0;
-                
-                if (path.classList.contains('ground')) {
-                    delay = 0.2;
-                    duration = 1.2;
-                } else if (path.classList.contains('structure')) {
-                    delay = 1.0;
-                    duration = 2.2;
-                } else if (path.classList.contains('roof-detail') || path.classList.contains('chimney') || path.classList.contains('porch')) {
-                    delay = 1.8;
-                    duration = 1.8;
-                } else if (path.classList.contains('shading') || path.classList.contains('finial')) {
-                    delay = 2.6;
-                    duration = 1.2;
-                } else if (path.classList.contains('house-window')) {
-                    delay = 2.8;
-                    duration = 1.0;
-                } else if (path.classList.contains('tree') || path.classList.contains('tree-branch')) {
-                    delay = 1.4;
-                    duration = 2.6;
-                } else if (path.classList.contains('fence-rail') || path.classList.contains('fence-picket')) {
-                    delay = 2.2;
-                    duration = 1.6;
-                }
-                
-                path.style.transition = `stroke-dashoffset ${duration}s cubic-bezier(0.4, 0, 0.2, 1) ${delay}s, opacity ${duration}s ease ${delay}s`;
+                path.style.transition = 'fill 2.5s ease-out, stroke 2.5s ease, stroke-width 2s ease';
             });
         });
+    }
 
-        // Trigger the drawing after rendering has caught up
-        setTimeout(() => {
-            houses.forEach((house) => {
-                const paths = house.querySelectorAll('.house-svg path');
-                paths.forEach((path) => {
-                    path.style.strokeDashoffset = '0';
-                });
+    function startCastleSketching() {
+        const houses = document.querySelectorAll('.house');
+        houses.forEach((house) => {
+            sketchHouse(house);
+        });
+    }
+
+    function sketchHouse(house) {
+        const svg = house.querySelector('.house-svg');
+        if (!svg) return;
+        
+        const svgNS = "http://www.w3.org/2000/svg";
+        const pen = document.createElementNS(svgNS, "g");
+        pen.setAttribute("class", "fountain-pen");
+        pen.style.opacity = "0";
+        pen.style.pointerEvents = "none";
+        pen.style.transition = "opacity 0.25s ease";
+        
+        pen.innerHTML = `
+            <!-- Nib metal -->
+            <path d="M 0,0 L -3,-8 L -8,-20 L -4,-24 L 4,-24 L 8,-20 L 3,-8 Z" fill="#e2e8f0" stroke="#475569" stroke-width="0.8" />
+            <!-- Nib slit -->
+            <line x1="0" y1="0" x2="0" y2="-12" stroke="#0f172a" stroke-width="0.8" />
+            <circle cx="0" cy="-12" r="0.8" fill="#0f172a" />
+            <!-- Pen Body -->
+            <path d="M -4,-24 L -5,-55 L 5,-55 L 4,-24 Z" fill="#1e1b4b" stroke="#4c1d95" stroke-width="0.8" />
+            <!-- Gold accents -->
+            <path d="M -4.5,-32 L 4.5,-32 L 4.5,-34 L -4.5,-34 Z" fill="#c9a84c" />
+            <path d="M -5,-51 L 5,-51 L 5,-54 L -5,-54 Z" fill="#c9a84c" />
+        `;
+        svg.appendChild(pen);
+
+        // Define drawing order of selectors
+        const selectorOrder = [
+            '.moon-glow',
+            '.ground',
+            '.tree.trunk',
+            '.tree-branch',
+            '.structure',
+            '.roof-detail',
+            '.porch',
+            '.porch-column',
+            '.steps',
+            '.chimney',
+            '.chimney-top',
+            '.finial',
+            '.fence-rail',
+            '.fence-picket',
+            '.shading',
+            '.house-window'
+        ];
+
+        // Gather all matching paths in order
+        const sortedPaths = [];
+        selectorOrder.forEach(selector => {
+            const elements = house.querySelectorAll(selector);
+            elements.forEach(el => sortedPaths.push(el));
+        });
+
+        let currentPathIndex = 0;
+        
+        function drawNextPath() {
+            if (currentPathIndex >= sortedPaths.length) {
+                // Done drawing
+                pen.style.opacity = '0';
+                setTimeout(() => pen.remove(), 300);
+                house.classList.add('active');
+                return;
+            }
+
+            const path = sortedPaths[currentPathIndex];
+            const length = parseFloat(path.getAttribute('data-length') || 0);
+
+            if (length === 0) {
+                currentPathIndex++;
+                drawNextPath();
+                return;
+            }
+
+            let pStart;
+            if (path.tagName === 'circle') {
+                pStart = { x: 165 - 110, y: 200 };
+            } else {
+                try {
+                    pStart = path.getPointAtLength(0);
+                } catch(e) {
+                    pStart = { x: 165, y: 200 };
+                }
+            }
+
+            // Move pen and show it
+            pen.setAttribute("transform", `translate(${pStart.x}, ${pStart.y}) rotate(-30)`);
+            pen.style.opacity = '1';
+
+            // Variable speed: longer lines take slightly more time, short scribbles are fast
+            const duration = Math.min(300, Math.max(50, length * 0.7));
+            let startTime = null;
+
+            function animate(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+                const progress = Math.min(1, elapsed / duration);
                 
-                // Once drawing transition is finished, active fills and glows
-                setTimeout(() => {
-                    house.classList.add('active');
-                }, 4000);
-            });
-        }, 150);
+                const distance = length * progress;
+                path.style.strokeDashoffset = length - distance;
+
+                let pt;
+                if (path.tagName === 'circle') {
+                    const angle = progress * 2 * Math.PI;
+                    pt = {
+                        x: 165 + 110 * Math.cos(angle + Math.PI),
+                        y: 200 + 110 * Math.sin(angle + Math.PI)
+                    };
+                } else {
+                    try {
+                        pt = path.getPointAtLength(distance);
+                    } catch(e) {
+                        pt = pStart;
+                    }
+                }
+
+                // Tilt and slight write-wiggle
+                const wiggle = Math.sin(progress * 30) * 3;
+                pen.setAttribute("transform", `translate(${pt.x}, ${pt.y}) rotate(${ -30 + wiggle })`);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    path.style.strokeDashoffset = '0';
+                    currentPathIndex++;
+                    setTimeout(drawNextPath, 10);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Delay starting the drawing slightly to let curtain fade begin
+        setTimeout(drawNextPath, 200);
     }
 
     // --- Start ---
