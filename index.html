@@ -198,7 +198,25 @@
         <div class="oracle-input-container">
             <div class="crystal-ball-wrapper">
                 <div class="crystal-ball-glow"></div>
+                <div class="orb-ring ring-1"></div>
+                <div class="orb-ring ring-2"></div>
                 <div class="crystal-ball" id="crystal-ball">
+                    <!-- Rotating symbols SVG -->
+                    <div class="orb-symbols">
+                        <svg viewBox="0 0 100 100" class="orb-symbols-svg">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(167, 139, 250, 0.12)" stroke-width="0.8" />
+                            <circle cx="50" cy="50" r="32" fill="none" stroke="rgba(167, 139, 250, 0.2)" stroke-width="0.8" stroke-dasharray="3 3" />
+                            <polygon points="50,15 80,75 20,75" fill="none" stroke="rgba(167, 139, 250, 0.2)" stroke-width="0.6" />
+                            <polygon points="50,85 80,25 20,25" fill="none" stroke="rgba(167, 139, 250, 0.12)" stroke-width="0.6" />
+                        </svg>
+                    </div>
+                    <!-- Internal energy particles -->
+                    <div class="orb-particles">
+                        <div class="orb-particle p1"></div>
+                        <div class="orb-particle p2"></div>
+                        <div class="orb-particle p3"></div>
+                        <div class="orb-particle p4"></div>
+                    </div>
                     <div class="crystal-inner">
                         <div class="crystal-swirl"></div>
                     </div>

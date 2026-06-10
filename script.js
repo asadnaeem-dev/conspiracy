@@ -66,6 +66,27 @@
         if (curtain) {
             curtain.addEventListener('click', revealDatabase);
         }
+
+        // Parallax mouse movements for background castles
+        document.addEventListener('mousemove', handleParallax);
+    }
+
+    // --- Background Castles Parallax ---
+    function handleParallax(e) {
+        if (!document.body.classList.contains('revealed')) return;
+        
+        const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+        const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+
+        const houseLeft = document.querySelector('.house-left');
+        const houseRight = document.querySelector('.house-right');
+
+        if (houseLeft) {
+            houseLeft.style.transform = `translate(${x * 12}px, ${y * 8}px)`;
+        }
+        if (houseRight) {
+            houseRight.style.transform = `translate(${x * -12}px, ${y * 8}px)`;
+        }
     }
 
     // --- Decryption Interface Reveal ---
@@ -107,6 +128,9 @@
         btnLoading.style.display = 'flex';
         generateBtn.disabled = true;
         crystalBall.classList.add('pulsing');
+
+        const ballWrapper = document.querySelector('.crystal-ball-wrapper');
+        if (ballWrapper) ballWrapper.classList.add('screen-shake');
 
         // Hide previous theory
         theorySection.hidden = true;
@@ -167,6 +191,8 @@
         btnLoading.style.display = 'none';
         generateBtn.disabled = false;
         crystalBall.classList.remove('pulsing');
+
+        if (ballWrapper) ballWrapper.classList.remove('screen-shake');
     }
 
     // --- Fetch Theory from Groq ---
@@ -374,10 +400,19 @@
 
     // --- Particles ---
     function setupParticles() {
-        const count = 30;
+        const count = 35;
         for (let i = 0; i < count; i++) {
             const p = document.createElement('div');
             p.classList.add('particle');
+
+            // Randomly color particles: 70% gold embers, 15% purple, 15% ice-blue
+            const randColor = Math.random();
+            if (randColor < 0.15) {
+                p.classList.add('p-purple');
+            } else if (randColor < 0.3) {
+                p.classList.add('p-blue');
+            }
+
             p.style.left = Math.random() * 100 + '%';
             p.style.animationDuration = (8 + Math.random() * 12) + 's';
             p.style.animationDelay = (Math.random() * 15) + 's';
