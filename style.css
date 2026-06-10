@@ -1180,6 +1180,28 @@ body.revealed .main-content {
     min-height: 60px;
 }
 
+.skip-btn {
+    display: none;
+    margin: 14px auto 0;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: all 0.3s ease;
+    padding: 6px 12px;
+    outline: none;
+}
+
+.skip-btn:hover {
+    color: var(--red-accent);
+    opacity: 1;
+    transform: scale(1.05);
+}
+
 /* Typewriter cursor */
 .theory-text.typing::after {
     content: '▌';

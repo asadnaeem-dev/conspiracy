@@ -18,12 +18,15 @@ export default async function handler(req, res) {
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
     if (!GROQ_API_KEY) {
-        return res.status(500).json({ error: 'Oracle configuration error. API key missing.' });
+        return res.status(500).json({ error: 'Decryption configuration error. API key missing.' });
     }
 
-    const systemPrompt = `You are a mysterious, ancient oracle who speaks in dark, cryptic prose. You reveal hidden truths and forbidden knowledge that "they" don't want people to know. Your tone is dramatic, ominous, and slightly unhinged — like a prophet in a gothic cathedral. You always speak as if you are unveiling a centuries-old secret.`;
+    const systemPrompt = `You are a highly classified government database decryption system. You extract redacted dossiers and decrypted documents. Your tone is clinical, serious, cold, and mysterious. Avoid fantasy tropes (no wizards, no fortune telling, no crystal ball talk). Speak of historical cover-ups, scientific experiments, missing persons, classified programs (e.g. Project MK-Ultra, Operation Paperclip), or industrial conspiracies. Include realistic details (e.g., years like 1968, specific research labs, codenames like 'PROJECT AXIOM'). The theory must feel unsettlingly realistic and absurdly believable.`;
 
-    const userPrompt = `Generate a single-paragraph conspiracy theory about: "${sanitizedWord}". Make it dramatic, spooky, and wildly imaginative. 2-4 sentences max. Do not use bullet points. Do not break character. Do not start with "Ah" or "Behold". Be creative and unpredictable.`;
+    const userPrompt = `Generate a single continuous paragraph classified dossier entry about: "${sanitizedWord}".
+    The entry must be between 100 and 180 words.
+    Do not use bullet points or lists. Do not start with introductory phrases like "Dossier decrypted:", "Here is the theory:", "Behold," or "WARNING:".
+    Start immediately with the historical or technical evidence. Make it feel like an authentic leaked report.`;
 
     try {
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -39,7 +42,7 @@ export default async function handler(req, res) {
                     { role: 'user', content: userPrompt }
                 ],
                 temperature: 0.9,
-                max_tokens: 200,
+                max_tokens: 350,
                 top_p: 1,
             }),
         });
@@ -47,7 +50,7 @@ export default async function handler(req, res) {
         if (!response.ok) {
             const errText = await response.text();
             console.error('Groq API error:', response.status, errText);
-            return res.status(502).json({ error: 'The Oracle\'s vision is clouded. Try again.' });
+            return res.status(502).json({ error: 'Decryption link timeout. Try again.' });
         }
 
         const data = await response.json();

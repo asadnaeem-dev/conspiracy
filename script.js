@@ -33,6 +33,7 @@
     let ambientGain = null;
     let isMuted = false;
     let ambientNodes = [];
+    let skipTypewriterFn = null;
 
     // --- Initialize ---
     function init() {
@@ -69,6 +70,24 @@
 
         // Parallax mouse movements for background castles
         document.addEventListener('mousemove', handleParallax);
+
+        // Skip decryption triggers
+        const skipBtn = document.getElementById('skip-btn');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Avoid triggering card click
+                if (skipTypewriterFn) skipTypewriterFn();
+            });
+        }
+
+        const theoryCard = document.getElementById('theory-card');
+        if (theoryCard) {
+            theoryCard.addEventListener('click', (e) => {
+                // Ignore click if user clicked the share button
+                if (e.target.closest('#share-btn')) return;
+                if (skipTypewriterFn) skipTypewriterFn();
+            });
+        }
     }
 
     // --- Background Castles Parallax ---
@@ -217,16 +236,61 @@
         return new Promise((resolve) => {
             element.textContent = '';
             element.classList.add('typing');
+            
+            const skipBtn = document.getElementById('skip-btn');
+            if (skipBtn) skipBtn.style.display = 'block';
+
             let i = 0;
-            const speed = 25; // ms per character
+            let timeoutId = null;
+            let isDone = false;
+
+            function cleanup() {
+                isDone = true;
+                if (timeoutId) clearTimeout(timeoutId);
+                element.classList.remove('typing');
+                if (skipBtn) skipBtn.style.display = 'none';
+                skipTypewriterFn = null;
+            }
+
+            // Assign global skip callback
+            skipTypewriterFn = () => {
+                if (isDone) return;
+                element.textContent = text;
+                cleanup();
+                playTypewriterHeavy();
+                resolve();
+            };
 
             function type() {
+                if (isDone) return;
+
                 if (i < text.length) {
-                    element.textContent += text.charAt(i);
+                    const char = text.charAt(i);
+                    element.textContent += char;
                     i++;
-                    setTimeout(type, speed);
+
+                    // Procedural typing sound triggers
+                    if (char === ' ') {
+                        // Soft space tap
+                    } else if (['.', '!', '?', ';'].includes(char)) {
+                        playTypewriterHeavy();
+                    } else {
+                        playTypewriterClick();
+                    }
+
+                    // Suspense delays: slow down at punctuation, add random wobble
+                    let delay = 22; // base speed
+                    if (['.', '!', '?'].includes(char)) {
+                        delay = 600; // end of sentence pause
+                    } else if ([',', ';', ':'].includes(char)) {
+                        delay = 250; // clause break pause
+                    } else {
+                        delay = delay + Math.random() * 16; // key wobble delay
+                    }
+
+                    timeoutId = setTimeout(type, delay);
                 } else {
-                    element.classList.remove('typing');
+                    cleanup();
                     resolve();
                 }
             }
@@ -314,6 +378,59 @@
             gain.connect(audioCtx.destination);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.05);
+        } catch (e){}
+    }
+
+    function playTypewriterClick() {
+        if (!audioCtx || isMuted) return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            // Subtle, organic pitch variation
+            const freq = 550 + Math.random() * 300;
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.012);
+
+            gain.gain.setValueAtTime(0.015 + Math.random() * 0.015, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.012);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.015);
+        } catch (e){}
+    }
+
+    function playTypewriterHeavy() {
+        if (!audioCtx || isMuted) return;
+        try {
+            // Noise burst for mechanical return/heavy strike sound
+            const bufferSize = audioCtx.sampleRate * 0.04; // 40ms
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            filter.Q.value = 2.5;
+
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.025, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
+
+            source.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            source.start();
+            source.stop(audioCtx.currentTime + 0.04);
         } catch (e){}
     }
 
