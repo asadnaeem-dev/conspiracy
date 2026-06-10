@@ -60,8 +60,7 @@
         isGenerating = true;
 
         // UI: loading state
-        btnText.hidden = true;
-        btnLoading.hidden = false;
+        generateBtn.classList.add('loading');
         generateBtn.disabled = true;
         crystalBall.classList.add('pulsing');
 
@@ -107,8 +106,7 @@
 
         // Reset UI
         isGenerating = false;
-        btnText.hidden = false;
-        btnLoading.hidden = true;
+        generateBtn.classList.remove('loading');
         generateBtn.disabled = false;
         crystalBall.classList.remove('pulsing');
     }

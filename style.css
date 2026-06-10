@@ -160,22 +160,22 @@ body::after {
     bottom: -20px;
     width: 200%;
     height: 100%;
-    opacity: 0.8;
+    opacity: 1;
 }
 
 .fog-1 {
-    background: radial-gradient(ellipse at center, var(--fog) 0%, transparent 65%);
+    background: radial-gradient(ellipse at center, rgba(180, 170, 200, 0.15) 0%, rgba(100, 80, 140, 0.06) 40%, transparent 70%);
     animation: fog-drift 18s ease-in-out infinite alternate;
 }
 
 .fog-2 {
-    background: radial-gradient(ellipse at 30% 50%, rgba(26, 16, 37, 0.6) 0%, transparent 60%);
+    background: radial-gradient(ellipse at 30% 50%, rgba(160, 150, 190, 0.12) 0%, rgba(80, 60, 120, 0.05) 35%, transparent 60%);
     animation: fog-drift 25s ease-in-out infinite alternate-reverse;
     animation-delay: -5s;
 }
 
 .fog-3 {
-    background: radial-gradient(ellipse at 70% 50%, rgba(26, 16, 37, 0.4) 0%, transparent 65%);
+    background: radial-gradient(ellipse at 70% 50%, rgba(140, 130, 180, 0.1) 0%, rgba(60, 40, 100, 0.04) 30%, transparent 65%);
     animation: fog-drift 22s ease-in-out infinite alternate;
     animation-delay: -10s;
 }
@@ -418,7 +418,6 @@ body::after {
     display: flex;
     flex-direction: column;
     line-height: 1.2;
-    animation: title-flicker 4s ease-in-out infinite;
 }
 
 .title-the {
@@ -426,6 +425,13 @@ body::after {
     letter-spacing: 0.5em;
     color: var(--gold);
     text-transform: uppercase;
+    animation: title-the-flicker 4s ease-in-out infinite;
+}
+
+@keyframes title-the-flicker {
+    0%, 100% { text-shadow: 0 0 10px rgba(201, 168, 76, 0.3); }
+    50% { text-shadow: 0 0 20px rgba(201, 168, 76, 0.6); }
+    70% { text-shadow: 0 0 6px rgba(201, 168, 76, 0.2); }
 }
 
 .title-main {
@@ -436,12 +442,14 @@ body::after {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
+    animation: title-main-flicker 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(201, 168, 76, 0.2));
 }
 
-@keyframes title-flicker {
-    0%, 100% { opacity: 0.9; }
-    50% { opacity: 1; }
-    70% { opacity: 0.85; }
+@keyframes title-main-flicker {
+    0%, 100% { filter: drop-shadow(0 0 15px rgba(201, 168, 76, 0.2)); }
+    50% { filter: drop-shadow(0 0 25px rgba(201, 168, 76, 0.4)); }
+    70% { filter: drop-shadow(0 0 8px rgba(201, 168, 76, 0.15)); }
 }
 
 .subtitle {
@@ -621,15 +629,23 @@ body::after {
     pointer-events: none;
 }
 
-.generate-btn .btn-text[hidden],
-.generate-btn .btn-loading[hidden] {
-    display: none !important;
-}
-
-.btn-loading {
-    display: flex;
+/* Loading state: controlled by .loading class on the button */
+.generate-btn .btn-loading {
+    display: none;
     align-items: center;
     gap: 8px;
+}
+
+.generate-btn .btn-text {
+    display: inline;
+}
+
+.generate-btn.loading .btn-loading {
+    display: flex;
+}
+
+.generate-btn.loading .btn-text {
+    display: none;
 }
 
 .loading-eye {
