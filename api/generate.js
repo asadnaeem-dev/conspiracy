@@ -221,7 +221,7 @@ export default async function handler(req, res) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'llama3-8b-8192',
+                model: 'llama-3.1-8b-instant',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user',   content: userPrompt   },
@@ -237,7 +237,11 @@ export default async function handler(req, res) {
         if (!groqRes.ok) {
             const errText = await groqRes.text();
             console.error(`Groq API error ${groqRes.status}:`, errText);
-            return res.status(502).json({ error: 'Decryption link timed out. Try again.' });
+            // Surface real error in dev; generic message still shown in UI
+            return res.status(502).json({
+                error: 'Decryption link timed out. Try again.',
+                _debug: `Groq ${groqRes.status}: ${errText.slice(0, 200)}`
+            });
         }
 
         const data = await groqRes.json();
