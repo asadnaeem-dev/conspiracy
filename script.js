@@ -15,6 +15,7 @@
     const theoryWord = document.getElementById('theory-word');
     const theoryText = document.getElementById('theory-text');
     const shareBtn = document.getElementById('share-btn');
+    const surpriseBtn = document.getElementById('surprise-btn');
     const soundToggle = document.getElementById('sound-toggle');
     const soundIcon = soundToggle.querySelector('.sound-icon');
     const lightningOverlay = document.getElementById('lightning-overlay');
@@ -55,6 +56,9 @@
             if (e.key === 'Enter') handleGenerate();
         });
         soundToggle.addEventListener('click', toggleSound);
+
+        // Surprise Me
+        surpriseBtn.addEventListener('click', handleSurprise);
 
         // Mystical eye cursor hover response over interactive crystal ball
         crystalBall.addEventListener('mouseenter', startWhisper);
@@ -131,6 +135,25 @@
         
         // 5. Fade in castles
         startCastleFadeIn();
+    }
+
+    // --- Surprise Me ---
+    const SURPRISE_KEYWORDS = [
+        'NASA', 'Vatican', 'Illuminati', 'Titanic', 'Bitcoin', 'Chemtrails',
+        'Roswell', 'JFK', 'Hitler', 'Nikola Tesla', 'Rothschild', 'Freemasons',
+        '5G', 'Flat Earth', 'Epstein', 'Moon Landing', 'Area 51', 'MKUltra',
+        'Bilderberg', 'Rockefeller', 'Princess Diana', 'COVID', 'Microchips',
+        'Tupac', 'Shakespeare', 'Antarctica', 'Pyramids', 'Vatican Archives',
+        'Big Pharma', 'Kissinger', 'Fluoride', 'HAARP', 'Deep State',
+        'CIA', 'Cleopatra', 'Stonehenge', 'Elvis', 'Skull and Bones'
+    ];
+
+    function handleSurprise() {
+        if (isGenerating) return;
+        const keyword = SURPRISE_KEYWORDS[Math.floor(Math.random() * SURPRISE_KEYWORDS.length)];
+        wordInput.value = keyword;
+        wordInput.dispatchEvent(new Event('input'));
+        handleGenerate();
     }
 
     // --- Generate Theory ---
