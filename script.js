@@ -131,8 +131,8 @@
             curtain.style.display = 'none';
         }, 3000);
         
-        // 5. Start procedural pen-sketching drawing of castles
-        startCastleSketching();
+        // 5. Fade in castles
+        startCastleFadeIn();
     }
 
     // --- Generate Theory ---
@@ -735,169 +735,24 @@
         exportCard.style.position = 'fixed';
     }
 
-    // --- House Pen-Stroke Animations ---
+    // --- Castle Fade-In Animations ---
     function initCastles() {
         const houses = document.querySelectorAll('.house');
         houses.forEach((house) => {
-            const paths = house.querySelectorAll('.house-svg path, .house-svg circle');
-            paths.forEach((path) => {
-                let length = 0;
-                if (path.tagName === 'circle') {
-                    length = 2 * Math.PI * parseFloat(path.getAttribute('r') || 110);
-                } else {
-                    try {
-                        length = path.getTotalLength();
-                    } catch (e) {
-                        length = 300;
-                    }
-                }
-                path.setAttribute('data-length', length);
-                path.style.strokeDasharray = length;
-                path.style.strokeDashoffset = length;
-                path.style.transition = 'fill 2.5s ease-out, stroke 2.5s ease, stroke-width 2s ease';
-            });
+            house.style.opacity = '0';
+            house.style.transition = 'none';
         });
     }
 
-    function startCastleSketching() {
+    function startCastleFadeIn() {
         const houses = document.querySelectorAll('.house');
-        houses.forEach((house) => {
-            sketchHouse(house);
-        });
-    }
-
-    function sketchHouse(house) {
-        const svg = house.querySelector('.house-svg');
-        if (!svg) return;
-        
-        const svgNS = "http://www.w3.org/2000/svg";
-        const pen = document.createElementNS(svgNS, "g");
-        pen.setAttribute("class", "fountain-pen");
-        pen.style.opacity = "0";
-        pen.style.pointerEvents = "none";
-        pen.style.transition = "opacity 0.25s ease";
-        
-        pen.innerHTML = `
-            <!-- Nib metal -->
-            <path d="M 0,0 L -3,-8 L -8,-20 L -4,-24 L 4,-24 L 8,-20 L 3,-8 Z" fill="#e2e8f0" stroke="#475569" stroke-width="0.8" />
-            <!-- Nib slit -->
-            <line x1="0" y1="0" x2="0" y2="-12" stroke="#0f172a" stroke-width="0.8" />
-            <circle cx="0" cy="-12" r="0.8" fill="#0f172a" />
-            <!-- Pen Body -->
-            <path d="M -4,-24 L -5,-55 L 5,-55 L 4,-24 Z" fill="#1e1b4b" stroke="#4c1d95" stroke-width="0.8" />
-            <!-- Gold accents -->
-            <path d="M -4.5,-32 L 4.5,-32 L 4.5,-34 L -4.5,-34 Z" fill="#c9a84c" />
-            <path d="M -5,-51 L 5,-51 L 5,-54 L -5,-54 Z" fill="#c9a84c" />
-        `;
-        svg.appendChild(pen);
-
-        // Define drawing order of selectors
-        const selectorOrder = [
-            '.moon-glow',
-            '.ground',
-            '.tree.trunk',
-            '.tree-branch',
-            '.structure',
-            '.roof-detail',
-            '.porch',
-            '.porch-column',
-            '.steps',
-            '.chimney',
-            '.chimney-top',
-            '.finial',
-            '.fence-rail',
-            '.fence-picket',
-            '.shading',
-            '.house-window'
-        ];
-
-        // Gather all matching paths in order
-        const sortedPaths = [];
-        selectorOrder.forEach(selector => {
-            const elements = house.querySelectorAll(selector);
-            elements.forEach(el => sortedPaths.push(el));
-        });
-
-        let currentPathIndex = 0;
-        
-        function drawNextPath() {
-            if (currentPathIndex >= sortedPaths.length) {
-                // Done drawing
-                pen.style.opacity = '0';
-                setTimeout(() => pen.remove(), 300);
+        houses.forEach((house, i) => {
+            setTimeout(() => {
+                house.style.transition = 'opacity 1.2s ease-in-out';
+                house.style.opacity = '1';
                 house.classList.add('active');
-                return;
-            }
-
-            const path = sortedPaths[currentPathIndex];
-            const length = parseFloat(path.getAttribute('data-length') || 0);
-
-            if (length === 0) {
-                currentPathIndex++;
-                drawNextPath();
-                return;
-            }
-
-            let pStart;
-            if (path.tagName === 'circle') {
-                pStart = { x: 165 - 110, y: 200 };
-            } else {
-                try {
-                    pStart = path.getPointAtLength(0);
-                } catch(e) {
-                    pStart = { x: 165, y: 200 };
-                }
-            }
-
-            // Move pen and show it
-            pen.setAttribute("transform", `translate(${pStart.x}, ${pStart.y}) rotate(-30)`);
-            pen.style.opacity = '1';
-
-            // Variable speed: longer lines take slightly more time, short scribbles are fast
-            const duration = Math.min(300, Math.max(50, length * 0.7));
-            let startTime = null;
-
-            function animate(timestamp) {
-                if (!startTime) startTime = timestamp;
-                const elapsed = timestamp - startTime;
-                const progress = Math.min(1, elapsed / duration);
-                
-                const distance = length * progress;
-                path.style.strokeDashoffset = length - distance;
-
-                let pt;
-                if (path.tagName === 'circle') {
-                    const angle = progress * 2 * Math.PI;
-                    pt = {
-                        x: 165 + 110 * Math.cos(angle + Math.PI),
-                        y: 200 + 110 * Math.sin(angle + Math.PI)
-                    };
-                } else {
-                    try {
-                        pt = path.getPointAtLength(distance);
-                    } catch(e) {
-                        pt = pStart;
-                    }
-                }
-
-                // Tilt and slight write-wiggle
-                const wiggle = Math.sin(progress * 30) * 3;
-                pen.setAttribute("transform", `translate(${pt.x}, ${pt.y}) rotate(${ -30 + wiggle })`);
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    path.style.strokeDashoffset = '0';
-                    currentPathIndex++;
-                    setTimeout(drawNextPath, 10);
-                }
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        // Delay starting the drawing slightly to let curtain fade begin
-        setTimeout(drawNextPath, 200);
+            }, i * 300);
+        });
     }
 
     // --- Start ---
