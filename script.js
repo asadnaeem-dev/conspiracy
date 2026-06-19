@@ -160,7 +160,7 @@
 
             // Export card
             exportWord.textContent = word.toUpperCase();
-            exportPlausibility.textContent = 'Classification: ' + classification;
+            exportPlausibility.textContent = 'conspiracy-eight.vercel.app';
 
             // Show theory section
             theorySection.hidden = false;
@@ -185,7 +185,6 @@
             theoryWord.textContent = 'ERROR';
             theoryText.textContent = 'The decryption connection was lost... ' + (err.message || 'Please try again.');
             theoryText.classList.remove('typing');
-            if (classificationValue) classificationValue.textContent = 'ERROR';
         }
 
         // Reset UI
