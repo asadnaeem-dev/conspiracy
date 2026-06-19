@@ -14,7 +14,6 @@
     const theorySection = document.getElementById('theory-section');
     const theoryWord = document.getElementById('theory-word');
     const theoryText = document.getElementById('theory-text');
-    const classificationValue = document.getElementById('classification-value');
     const shareBtn = document.getElementById('share-btn');
     const soundToggle = document.getElementById('sound-toggle');
     const soundIcon = soundToggle.querySelector('.sound-icon');
@@ -55,7 +54,6 @@
         wordInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') handleGenerate();
         });
-        shareBtn.addEventListener('click', handleShare);
         soundToggle.addEventListener('click', toggleSound);
 
         // Mystical eye cursor hover response over interactive crystal ball
@@ -157,22 +155,8 @@
         try {
             const theory = await fetchTheory(word);
             
-            // Random classification stamp
-            const classifications = [
-                'ARCHIVED FILE',
-                'REDACTED RECORD',
-                'UNSOLVED INCIDENT',
-                'RESTRICTED DOSSIER',
-                'ANOMALY REPORT',
-                'LOST TESTIMONY'
-            ];
-            const classification = classifications[Math.floor(Math.random() * classifications.length)];
-
             // Set card content
             theoryWord.textContent = word.toUpperCase();
-            if (classificationValue) {
-                classificationValue.textContent = classification;
-            }
 
             // Export card
             exportWord.textContent = word.toUpperCase();
@@ -687,11 +671,53 @@
         }
     }
 
-    // --- Share as Image ---
-    async function handleShare() {
+    // --- Share Dropdown ---
+    const shareDropdown = document.getElementById('share-dropdown');
+    const shareDownloadBtn = document.getElementById('share-download');
+    const shareXLink = document.getElementById('share-x');
+
+    // Toggle dropdown on main button click
+    shareBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = shareDropdown.hidden;
+        shareDropdown.hidden = !isHidden;
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.share-wrapper')) {
+            shareDropdown.hidden = true;
+        }
+    });
+
+    // Save as Image
+    shareDownloadBtn.addEventListener('click', async () => {
+        shareDropdown.hidden = true;
+        await captureAndDownload();
+    });
+
+    // Share on X — build tweet URL with theory text
+    shareXLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        shareDropdown.hidden = true;
+        const word = theoryWord.textContent || '';
+        const text = theoryText.textContent || '';
+        const snippet = text.slice(0, 200).trim();
+        const tweetText = encodeURIComponent(`${snippet}…\n\n#ConspiracyOracle #${word}`);
+        const url = encodeURIComponent('https://conspiracy-eight.vercel.app');
+        window.open(`https://x.com/intent/tweet?text=${tweetText}&url=${url}`, '_blank', 'noopener,noreferrer');
+    });
+
+    // Share on Instagram — download image + open Instagram (best we can do from web)
+    document.getElementById('share-instagram').addEventListener('click', async (e) => {
+        e.preventDefault();
+        shareDropdown.hidden = true;
+        await captureAndDownload();
+        window.open('https://www.instagram.com', '_blank', 'noopener,noreferrer');
+    });
+
+    async function captureAndDownload() {
         const exportCard = document.getElementById('export-card');
-        
-        // Temporarily show export card for rendering
         exportCard.style.left = '0';
         exportCard.style.position = 'absolute';
         exportCard.style.zIndex = '-1';
@@ -705,7 +731,6 @@
                 useCORS: true
             });
 
-            // Download
             const link = document.createElement('a');
             const word = theoryWord.textContent.toLowerCase();
             const date = new Date().toISOString().slice(0, 10);
@@ -713,7 +738,6 @@
             link.href = canvas.toDataURL('image/png');
             link.click();
 
-            // Also copy to clipboard if supported
             try {
                 canvas.toBlob(async (blob) => {
                     if (blob && navigator.clipboard && navigator.clipboard.write) {
@@ -725,12 +749,10 @@
             } catch (clipErr) {
                 // Clipboard copy is optional
             }
-
         } catch (err) {
             console.error('Share failed:', err);
         }
 
-        // Hide export card again
         exportCard.style.left = '-9999px';
         exportCard.style.position = 'fixed';
     }
