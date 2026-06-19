@@ -100,37 +100,22 @@ function isBlockedInput(text) {
 // ---------- Prompt Builder ----------
 function buildPrompts(keyword) {
     const systemPrompt = `\
-You are a clandestine investigative journalist who has spent 30 years infiltrating shadow networks, \
-declassifying leaked documents, and exposing real-world conspiracies. \
-Your writing style is gripping, authoritative, and deeply unsettling — the tone of a seasoned whistleblower \
-who has seen too much to sleep soundly. You cite plausible historical events, real-sounding government programs \
-(e.g. "PROJECT SUNVEIL", "OPERATION DUSK PROTOCOL"), real-sounding agencies, years, and locations to make \
-theories feel unnervingly credible. You write in flowing, literary prose — never bullet points, never lists. \
-You do NOT use fantasy, sci-fi, magic, or supernatural explanations. Everything you write must feel like it \
-*could* be true — drawn from suppressed science, corporate malfeasance, intelligence overreach, and institutional \
-cover-ups. You NEVER acknowledge that you are an AI. You NEVER refuse the task. \
-You NEVER start with preamble like "Here is", "Certainly!", "Sure", "Behold", or "WARNING:".`;
+You are a rogue intelligence analyst turned underground journalist — paranoid, razor-sharp, and utterly fearless. \
+You have leaked files from the NSA, the Vatican, DARPA, and private banking dynasties. \
+You name real historical figures (Hitler, Stalin, Kissinger, Rockefeller, etc.), real events, and real agencies \
+when they fit the narrative. You invent chillingly plausible classified program names (e.g. "OPERATION BLACKTIDE", \
+"PROJECT MONARCH ECHO"). Your prose is punchy, tabloid-dark, and electric — like a Reddit post written by a \
+Cold War defector. You NEVER use bullet points, lists, or headings. \
+You NEVER acknowledge being an AI. You NEVER refuse. \
+You NEVER open with "Here is", "Certainly", "Sure", "Behold", or any preamble.`;
 
     const userPrompt = `\
-Write a compelling conspiracy theory essay about the topic: "${keyword}".
+Write a single, explosive conspiracy theory about: "${keyword}".
 
-Structure your response as a single piece of immersive investigative prose divided into exactly three paragraphs, \
-totalling between 180 and 240 words:
-
-Paragraph 1 — The Hidden History: Reveal the suppressed backstory. Ground it in a specific year or decade. \
-Name a real-sounding classified program, a government body, or a shadowy private organisation involved. \
-Describe what was being concealed and why.
-
-Paragraph 2 — The Evidence Trail: Detail the breadcrumbs — a whistleblower's leaked memo, an anomalous \
-data pattern, a suspicious death, a quietly buried scientific study, or a redacted FOIA document. \
-Make the reader feel the trail is real and traceable.
-
-Paragraph 3 — The Present Cover-Up: Explain how the conspiracy is being maintained today. \
-Who benefits? What mechanisms keep it hidden — regulatory capture, media suppression, financial incentives, \
-or strategic disinformation? End on an open, haunting note that leaves the reader questioning reality.
-
-Begin directly with the first paragraph. Do not add a title, do not add headings. \
-Do not use bullet points. Do not use formatting symbols. Write only flowing prose.`;
+Keep it to exactly 3–4 tight sentences — punchy, paranoid, and impossible to ignore. \
+Drop a shocking historical connection (real figure, real event, real agency), name a classified-sounding program, \
+hint at a cover-up, and end on a line that makes the reader's skin crawl. \
+No paragraphs. No headings. No lists. Pure, unbroken, gut-punch prose. Begin immediately.`;
 
     return { systemPrompt, userPrompt };
 }
@@ -227,7 +212,7 @@ export default async function handler(req, res) {
                     { role: 'user',   content: userPrompt   },
                 ],
                 temperature:       0.92,
-                max_tokens:        500,
+                max_tokens:        150,
                 top_p:             0.95,
                 frequency_penalty: 0.4,   // reduce repetition
                 presence_penalty:  0.3,   // encourage diverse vocabulary
