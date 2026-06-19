@@ -185,16 +185,15 @@
             theoryWord.textContent = 'ERROR';
             theoryText.textContent = 'The decryption connection was lost... ' + (err.message || 'Please try again.');
             theoryText.classList.remove('typing');
+        } finally {
+            // Reset UI — always runs, even on unexpected errors
+            isGenerating = false;
+            btnText.style.display = '';
+            btnLoading.style.display = 'none';
+            generateBtn.disabled = false;
+            crystalBall.classList.remove('pulsing');
+            if (ballWrapper) ballWrapper.classList.remove('screen-shake');
         }
-
-        // Reset UI
-        isGenerating = false;
-        btnText.style.display = '';
-        btnLoading.style.display = 'none';
-        generateBtn.disabled = false;
-        crystalBall.classList.remove('pulsing');
-
-        if (ballWrapper) ballWrapper.classList.remove('screen-shake');
     }
 
     // --- Fetch Theory from Groq ---
