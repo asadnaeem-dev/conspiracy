@@ -1491,6 +1491,47 @@ body.revealed .footer {
         flex-direction: column;
         gap: 8px;
     }
-    
+}
 
+/* --- Interactive Easter Eggs (Cursed Mode) --- */
+body.cursed-mode {
+    background-color: #0a0000;
+    transition: background-color 0.1s ease;
+}
+
+body.cursed-mode::before {
+    background: 
+        radial-gradient(ellipse at 20% 50%, rgba(200, 0, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(200, 0, 0, 0.1) 0%, transparent 50%);
+}
+
+.occult-symbol {
+    position: fixed;
+    color: #ff1a1a;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+    animation: flash-symbol 0.3s ease-in-out forwards;
+    filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.9));
+}
+
+@keyframes flash-symbol {
+    0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+    30% { opacity: 0.9; transform: scale(1.5) rotate(15deg); }
+    100% { opacity: 0; transform: scale(1) rotate(0deg); }
+}
+
+.glitch-text {
+    animation: text-glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+    color: #ff3333;
+    text-shadow: 2px 0 #00f2fe, -2px 0 #7c3aed;
+}
+
+@keyframes text-glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 1px); }
+    40% { transform: translate(2px, -1px); }
+    60% { transform: translate(-1px, 2px); }
+    80% { transform: translate(1px, -2px); }
+    100% { transform: translate(0); }
 }

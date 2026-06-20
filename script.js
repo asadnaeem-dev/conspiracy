@@ -156,10 +156,119 @@
         handleGenerate();
     }
 
+    // --- Interactive Easter Eggs ---
+    const CURSED_KEYWORDS = ['ILLUMINATI', 'ABYSS', 'HELL', 'DEMON', 'LILITH'];
+    const OCCULT_SYMBOLS = ['🜏', '🜱', '⚸', '♇', '⛧'];
+    const CREEPY_QUOTES = [
+        '"The world is governed by very different personages from what is imagined by those who are not behind the scenes." — Benjamin Disraeli',
+        '"And if thou gaze long into an abyss, the abyss will also gaze into thee." — Friedrich Nietzsche',
+        '"Hell is empty and all the devils are here." — William Shakespeare'
+    ];
+
+    function triggerCursedMode(word) {
+        isGenerating = true;
+
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'flex';
+        generateBtn.disabled = true;
+        crystalBall.classList.add('pulsing');
+        
+        const ballWrapper = document.querySelector('.crystal-ball-wrapper');
+        if (ballWrapper) ballWrapper.classList.add('screen-shake');
+
+        document.body.classList.add('cursed-mode');
+
+        // Play loud creepy sound
+        playGlitchSound();
+
+        // Flash symbols
+        flashOccultSymbols();
+
+        theorySection.hidden = true;
+        
+        setTimeout(async () => {
+            theoryWord.textContent = word.toUpperCase();
+            exportWord.textContent = word.toUpperCase();
+            
+            const quote = CREEPY_QUOTES[Math.floor(Math.random() * CREEPY_QUOTES.length)];
+            
+            theorySection.hidden = false;
+            theorySection.style.animation = 'none';
+            void theorySection.offsetHeight;
+            theorySection.style.animation = '';
+            
+            theoryText.classList.add('glitch-text');
+            
+            await typewriterEffect(theoryText, quote);
+            exportText.textContent = quote;
+            
+            isGenerating = false;
+            btnText.style.display = '';
+            btnLoading.style.display = 'none';
+            generateBtn.disabled = false;
+            crystalBall.classList.remove('pulsing');
+            if (ballWrapper) ballWrapper.classList.remove('screen-shake');
+        }, 1500);
+    }
+
+    function flashOccultSymbols() {
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => {
+                const sym = document.createElement('div');
+                sym.className = 'occult-symbol';
+                sym.textContent = OCCULT_SYMBOLS[Math.floor(Math.random() * OCCULT_SYMBOLS.length)];
+                sym.style.left = (Math.random() * 90) + 'vw';
+                sym.style.top = (Math.random() * 90) + 'vh';
+                sym.style.fontSize = (3 + Math.random() * 8) + 'rem';
+                document.body.appendChild(sym);
+                
+                setTimeout(() => sym.remove(), 600);
+            }, Math.random() * 2000);
+        }
+    }
+
+    function playGlitchSound() {
+        if (!audioCtx || isMuted) return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sawtooth';
+            osc2.type = 'square';
+            
+            osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 1.5);
+            
+            osc2.frequency.setValueAtTime(120, audioCtx.currentTime);
+            osc2.frequency.linearRampToValueAtTime(10, audioCtx.currentTime + 1.5);
+
+            gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+
+            osc.connect(gain);
+            osc2.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc2.start();
+            osc.stop(audioCtx.currentTime + 1.5);
+            osc2.stop(audioCtx.currentTime + 1.5);
+        } catch (e){}
+    }
+
     // --- Generate Theory ---
     async function handleGenerate() {
         const word = wordInput.value.trim();
         if (!word || isGenerating) return;
+
+        if (CURSED_KEYWORDS.includes(word.toUpperCase())) {
+            return triggerCursedMode(word);
+        }
+
+        // Reset cursèd mode if returning to normal words
+        document.body.classList.remove('cursed-mode');
+        theoryText.classList.remove('glitch-text');
 
         isGenerating = true;
 
