@@ -1,59 +1,78 @@
-# 🕯️ The Conspiracy Oracle
+# 🕯️ The Conspiracy Oracle 👁️
 
 > *Speak a word, and the Oracle shall reveal what **they** don't want you to know.*
 
-A dark, gothic web app that generates AI-powered conspiracy theories from a single word. Built with a Harry Potter-inspired aesthetic, haunted houses, flying bats, typewriter reveals, and ambient thunderstorms.
+Step into the shadows with **The Conspiracy Oracle**, a dark, gothic, Harry Potter-inspired web application that decrypts classified "anomalies" and generates wild, AI-powered conspiracy theories from a single keyword.
 
-## ✨ Features
-
-- 🔮 **AI-Generated Conspiracy Theories** — Powered by Groq (LLaMA 3)
-- 🏚️ **Animated Haunted Houses** — Flickering windows, chimney smoke, subtle sway
-- 👁️ **Custom Eye Cursor** — Mystical eye follows your every move
-- ⚡ **Typewriter Reveal** — Theories appear letter by letter
-- 🦇 **Flying Bats** — Triggered on each new theory
-- ⛈️ **Ambient Sound** — Wind and thunder via Web Audio API
-- 🌩️ **Random Lightning** — Flashes illuminate the darkness
-- 📤 **Share as Image** — Download your theory as a styled PNG
-- 🌫️ **Atmospheric Fog** — Drifting fog layers at the bottom
-- ✨ **Floating Particles** — Golden dust motes rising upward
-
-## 🚀 Deploy to Vercel
-
-1. Push this repo to GitHub
-2. Import it into [Vercel](https://vercel.com)
-3. Add environment variable: `GROQ_API_KEY` (get one free at [console.groq.com](https://console.groq.com))
-4. Deploy!
-
-## 🛠️ Local Development
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Create .env file
-echo "GROQ_API_KEY=your_key_here" > .env
-
-# Run locally
-vercel dev
-```
-
-## 📁 Structure
-
-```
-├── index.html          # Page structure
-├── style.css           # Gothic design system & animations
-├── script.js           # App logic, effects, sound
-├── api/generate.js     # Vercel serverless Groq proxy
-├── assets/             # Cursors, haunted house images
-└── vercel.json         # Deployment config
-```
-
-## 🎨 Design
-
-- **Fonts**: Cinzel Decorative, Cinzel, IM Fell English (Google Fonts)
-- **Colors**: Deep blacks, wizard purples, parchment gold
-- **Aesthetic**: Dark gothic Harry Potter meets occult mystery
+With flickering haunted houses, flying bats, atmospheric fog, and a cinematic typewriter reveal, this application doesn't just generate text—it crafts an immersive, eerie experience.
 
 ---
 
-*All theories are AI-generated fiction. The Oracle takes no responsibility for existential crises.*
+## ✨ Features
+
+- 🔮 **AI-Generated Conspiracy Theories** — Powered by Groq (LLaMA 3) for lightning-fast, creative, and unhinged lore.
+- 🏚️ **Animated Haunted Houses** — Moonlit silhouettes, flickering windows, and chimney smoke that bring the background to life.
+- ⚡ **Cinematic Typewriter Reveal** — Watch your theory unfold letter-by-letter like a classified document.
+- 🦇 **Swarming Bats** — Trigger a swarm of bats on every new decryption.
+- ⛈️ **Ambient Soundscapes** — Wind and thunder generated via Web Audio API for a truly haunted atmosphere.
+- 🌩️ **Random Lightning Flashes** — Illumination from the digital storm.
+- 📤 **Share Evidence** — Download your decrypted evidence as a beautifully styled PNG to share with the world.
+- 🌫️ **Atmospheric Fog & Golden Particles** — Drifting fog layers and rising motes of dust that pull you deeper into the mystery.
+
+---
+
+## 🚀 Deployment (Vercel)
+
+1. Push this repository to GitHub.
+2. Import the project into [Vercel](https://vercel.com).
+3. Add the following environment variable: `GROQ_API_KEY` *(Get yours free at [console.groq.com](https://console.groq.com))*
+4. Deploy and reveal the truth!
+
+---
+
+## 🛠️ Local Development
+
+Clone the repo and fire it up locally to experiment with the dark arts of web development.
+
+```bash
+# Install the Vercel CLI globally
+npm i -g vercel
+
+# Create your environment file
+echo "GROQ_API_KEY=your_key_here" > .env
+
+# Run the local development server
+vercel dev
+```
+
+---
+
+## 🗺️ What's Next? (Roadmap)
+
+The Oracle's work is never done. Here is what we are currently working on next:
+- [ ] **Multi-word Phrases & Complex Anomaly Decryption:** Expanding the input system to handle complex queries, sentences, and multi-variable anomalies.
+- [ ] **Deeper Lore Integration:** Building an interconnected web of conspiracies so new theories reference past decryptions.
+- [ ] **Interactive Easter Eggs:** Hidden secrets scattered throughout the UI, triggered by specific mysterious keywords.
+- [ ] **Enhanced Audio Engine:** Evolving the soundscapes with adaptive music and more dynamic, unsettling sound effects.
+- [ ] **User Accounts & "Archive" Feature:** Allowing agents to save, upvote, and catalog the best theories for future reference.
+
+---
+
+## 📁 Architecture
+
+```
+├── index.html          # Core structure & SVG assets
+├── style.css           # Gothic styling, CSS variables & animations
+├── script.js           # App logic, effects, API handling, sound
+├── api/generate.js     # Vercel Serverless Function (Groq Proxy)
+├── assets/             # Static assets
+└── vercel.json         # Vercel routing configuration
+```
+
+## 🎨 Aesthetic Profile
+- **Typography**: *Cinzel Decorative*, *Cinzel*, and *IM Fell English*
+- **Palette**: Abyssal blacks, wizarding purples, and parchment golds.
+
+---
+
+*Disclaimer: All theories are strictly AI-generated fiction. The Oracle takes no responsibility for existential crises, sudden paranoia, or men in black appearing at your doorstep.*
