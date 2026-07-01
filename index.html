@@ -14,7 +14,7 @@
     <!-- html2canvas for share-as-image -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
     
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
     <!-- Cinematic Intro Overlays -->
@@ -31,6 +31,23 @@
     <button id="sound-toggle" class="sound-toggle" aria-label="Toggle ambient sound">
         <span class="sound-icon">🔊</span>
     </button>
+
+    <!-- History toggle -->
+    <button id="history-toggle" class="history-toggle" aria-label="View history" title="Dossier History">
+        <span>📜</span>
+        <span class="history-badge" id="history-badge" style="display:none"></span>
+    </button>
+
+    <!-- History Panel -->
+    <aside id="history-panel" class="history-panel" aria-label="Dossier History" hidden>
+        <div class="history-panel-header">
+            <h2 class="history-panel-title">📜 Dossier Archive</h2>
+            <button id="history-close" class="history-close" aria-label="Close history">✕</button>
+        </div>
+        <div id="history-list" class="history-list"></div>
+        <button id="history-clear" class="history-clear">🗑 Clear Archive</button>
+    </aside>
+    <div id="history-overlay" class="history-overlay" hidden></div>
 
     <!-- Lightning flash overlay -->
     <div id="lightning-overlay" class="lightning-overlay"></div>
@@ -223,25 +240,31 @@
                 </div>
             </div>
             <div class="input-wrapper">
-                <input 
-                    type="text" 
-                    id="word-input" 
-                    class="word-input" 
-                    placeholder="Enter a word..." 
-                    maxlength="30"
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-                <button id="generate-btn" class="generate-btn">
-                    <span class="btn-text">Decrypt Dossier</span>
-                    <span class="btn-loading" style="display:none">
-                        <span class="loading-eye">👁️</span>
-                        <span>Decrypting Archive...</span>
-                    </span>
-                </button>
-                <button id="surprise-btn" class="surprise-btn">
-                    🎲 Surprise Me
-                </button>
+                <div class="input-field-wrap">
+                    <input 
+                        type="text" 
+                        id="word-input" 
+                        class="word-input" 
+                        placeholder="Enter a word..." 
+                        maxlength="30"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <span id="char-counter" class="char-counter">30</span>
+                </div>
+                <div class="btn-row">
+                    <button id="generate-btn" class="generate-btn">
+                        <span class="btn-text">Decrypt Dossier</span>
+                        <span class="btn-loading" style="display:none">
+                            <span class="loading-eye">👁️</span>
+                            <span>Decrypting Archive...</span>
+                        </span>
+                    </button>
+                    <button id="surprise-btn" class="surprise-btn" title="Random keyword">
+                        🎲 Surprise Me
+                    </button>
+                </div>
+                <span class="enter-hint">Press <kbd>Enter ↵</kbd> to decrypt</span>
             </div>
         </div>
 
@@ -260,7 +283,26 @@
                     </div>
                     <p id="theory-text" class="theory-text"></p>
                     <button id="skip-btn" class="skip-btn" style="display: none;">[ Skip Decryption ]</button>
+
+                    <!-- Plausibility meter -->
+                    <div class="plausibility-meter" id="plausibility-meter" style="display:none">
+                        <div class="plausibility-meter-header">
+                            <span class="plausibility-meter-label">CONSPIRACY PLAUSIBILITY</span>
+                            <span class="plausibility-meter-value" id="plausibility-value">0%</span>
+                        </div>
+                        <div class="plausibility-bar-track">
+                            <div class="plausibility-bar-fill" id="plausibility-bar"></div>
+                        </div>
+                        <span class="plausibility-verdict" id="plausibility-verdict"></span>
+                    </div>
+
+                    <!-- Tag chips -->
+                    <div class="theory-tags" id="theory-tags"></div>
+
                     <div class="card-footer">
+                        <button id="copy-btn" class="copy-btn" title="Copy theory text">
+                            <span id="copy-icon">📋</span> Copy
+                        </button>
                         <div class="share-wrapper">
                             <button id="share-btn" class="share-btn">
                                 <span>📤</span> Share Evidence
@@ -304,6 +346,6 @@
         <p>Warning: Accessing unauthorized dossiers. <span class="footer-dim">All records are AI-generated fiction.</span></p>
     </footer>
 
-    <script src="script.js?v=4"></script>
+    <script src="script.js?v=5"></script>
 </body>
 </html>

@@ -21,6 +21,22 @@
     const lightningOverlay = document.getElementById('lightning-overlay');
     const batsContainer = document.getElementById('bats-container');
     const particlesContainer = document.getElementById('particles');
+    const charCounter = document.getElementById('char-counter');
+    const historyToggle = document.getElementById('history-toggle');
+    const historyPanel = document.getElementById('history-panel');
+    const historyClose = document.getElementById('history-close');
+    const historyList = document.getElementById('history-list');
+    const historyClear = document.getElementById('history-clear');
+    const historyOverlay = document.getElementById('history-overlay');
+    const historyBadge = document.getElementById('history-badge');
+    const copyBtn = document.getElementById('copy-btn');
+    const copyIcon = document.getElementById('copy-icon');
+    const plausibilityMeter = document.getElementById('plausibility-meter');
+    const plausibilityBar = document.getElementById('plausibility-bar');
+    const plausibilityValue = document.getElementById('plausibility-value');
+    const plausibilityVerdict = document.getElementById('plausibility-verdict');
+    const theoryTagsEl = document.getElementById('theory-tags');
+    // (batsContainer already declared above)
 
     // Export card elements
     const exportWord = document.getElementById('export-word');
@@ -57,6 +73,14 @@
         });
         soundToggle.addEventListener('click', toggleSound);
 
+        // Character counter
+        wordInput.addEventListener('input', () => {
+            const remaining = 30 - wordInput.value.length;
+            charCounter.textContent = remaining;
+            charCounter.classList.toggle('warn', remaining <= 10 && remaining > 5);
+            charCounter.classList.toggle('danger', remaining <= 5);
+        });
+
         // Surprise Me
         surpriseBtn.addEventListener('click', handleSurprise);
 
@@ -85,11 +109,21 @@
         const theoryCard = document.getElementById('theory-card');
         if (theoryCard) {
             theoryCard.addEventListener('click', (e) => {
-                // Ignore click if user clicked the share button
+                // Ignore click if user clicked the share button or copy button
                 if (e.target.closest('#share-btn')) return;
+                if (e.target.closest('#copy-btn')) return;
                 if (skipTypewriterFn) skipTypewriterFn();
             });
         }
+
+        // History panel
+        historyToggle.addEventListener('click', openHistoryPanel);
+        historyClose.addEventListener('click', closeHistoryPanel);
+        historyOverlay.addEventListener('click', closeHistoryPanel);
+        historyClear.addEventListener('click', clearHistory);
+
+        // Copy button
+        copyBtn.addEventListener('click', handleCopy);
     }
 
     // --- Background Castles Parallax ---
@@ -301,6 +335,11 @@
             void theorySection.offsetHeight;
             theorySection.style.animation = '';
 
+            // Reset & hide plausibility/tags until typewriter done
+            plausibilityMeter.style.display = 'none';
+            plausibilityBar.style.width = '0%';
+            theoryTagsEl.innerHTML = '';
+
             // Trigger bats
             spawnBats();
 
@@ -311,6 +350,13 @@
             // Then run typewriter effect for the theory text
             await typewriterEffect(theoryText, theory);
             exportText.textContent = theory;
+
+            // After typewriter: show plausibility meter + tags
+            showPlausibilityMeter();
+            showTheoryTags(word, theory);
+
+            // Save to history
+            saveToHistory(word, theory);
 
         } catch (err) {
             theorySection.hidden = false;
@@ -907,6 +953,228 @@
         });
     }
 
+    // ============================================
+    //  HISTORY
+    // ============================================
+    const HISTORY_KEY = 'conspiracy_history';
+    const MAX_HISTORY = 20;
+
+    function loadHistory() {
+        try {
+            return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        } catch { return []; }
+    }
+
+    function saveToHistory(word, theory) {
+        const history = loadHistory();
+        // Avoid duplicate consecutive entries
+        if (history.length && history[0].word === word.toUpperCase()) return;
+        history.unshift({
+            word: word.toUpperCase(),
+            theory,
+            ts: Date.now()
+        });
+        if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        updateHistoryBadge();
+    }
+
+    function updateHistoryBadge() {
+        const history = loadHistory();
+        if (history.length > 0) {
+            historyBadge.textContent = history.length;
+            historyBadge.style.display = 'flex';
+        } else {
+            historyBadge.style.display = 'none';
+        }
+    }
+
+    function renderHistory() {
+        const history = loadHistory();
+        historyList.innerHTML = '';
+        if (history.length === 0) {
+            historyList.innerHTML = '<div class="history-empty">No dossiers decrypted yet.<br>Enter a keyword to begin.</div>';
+            return;
+        }
+        history.forEach((entry, idx) => {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <div class="history-item-word">
+                    <span>${entry.word}</span>
+                    <span class="history-item-time">${formatHistoryTime(entry.ts)}</span>
+                </div>
+                <div class="history-item-preview">${entry.theory}</div>
+            `;
+            item.addEventListener('click', () => {
+                // Load this entry into the main card
+                wordInput.value = entry.word;
+                theoryWord.textContent = entry.word;
+                theoryText.textContent = entry.theory;
+                theorySection.hidden = false;
+                exportWord.textContent = entry.word;
+                exportText.textContent = entry.theory;
+                plausibilityMeter.style.display = 'none';
+                theoryTagsEl.innerHTML = '';
+                // Animate it in
+                theorySection.style.animation = 'none';
+                void theorySection.offsetHeight;
+                theorySection.style.animation = '';
+                setTimeout(() => {
+                    showPlausibilityMeter();
+                    showTheoryTags(entry.word, entry.theory);
+                }, 200);
+                closeHistoryPanel();
+            });
+            historyList.appendChild(item);
+        });
+    }
+
+    function formatHistoryTime(ts) {
+        const d = new Date(ts);
+        const now = new Date();
+        const diff = now - d;
+        if (diff < 60000) return 'just now';
+        if (diff < 3600000) return `${Math.floor(diff/60000)}m ago`;
+        if (diff < 86400000) return `${Math.floor(diff/3600000)}h ago`;
+        return d.toLocaleDateString();
+    }
+
+    function openHistoryPanel() {
+        renderHistory();
+        historyPanel.hidden = false;
+        historyOverlay.hidden = false;
+        // Force reflow so CSS transition fires
+        void historyPanel.offsetHeight;
+    }
+
+    function closeHistoryPanel() {
+        historyPanel.hidden = true;
+        historyOverlay.hidden = true;
+    }
+
+    function clearHistory() {
+        localStorage.removeItem(HISTORY_KEY);
+        updateHistoryBadge();
+        renderHistory();
+    }
+
+    // ============================================
+    //  PLAUSIBILITY METER
+    // ============================================
+    const VERDICTS = [
+        { max: 20,  label: 'Highly Sceptical',        color: '#6b7280' },
+        { max: 40,  label: 'Doubtful',                 color: '#a78bfa' },
+        { max: 60,  label: 'Suspiciously Plausible',   color: '#c9a84c' },
+        { max: 80,  label: 'Alarmingly Credible',      color: '#f59e0b' },
+        { max: 101, label: 'THEY ARE WATCHING',        color: '#ef4444' },
+    ];
+
+    function showPlausibilityMeter() {
+        const pct = Math.floor(30 + Math.random() * 65); // 30–94%
+        plausibilityMeter.style.display = 'block';
+        
+        // Animate bar after paint
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                plausibilityBar.style.width = pct + '%';
+            });
+        });
+
+        // Count up number
+        let current = 0;
+        const step = pct / 60;
+        const interval = setInterval(() => {
+            current = Math.min(current + step, pct);
+            plausibilityValue.textContent = Math.round(current) + '%';
+            if (current >= pct) {
+                clearInterval(interval);
+                // Set verdict
+                const verdict = VERDICTS.find(v => pct < v.max);
+                if (verdict) {
+                    plausibilityVerdict.textContent = `— ${verdict.label}`;
+                    if (typeof verdict.color === 'string') {
+                        plausibilityValue.style.color = verdict.color;
+                    }
+                }
+            }
+        }, 25);
+    }
+
+    // ============================================
+    //  THEORY TAG CHIPS
+    // ============================================
+    // Keywords to extract from theory text for tag chips
+    const TAG_SEEDS = [
+        'CIA','NSA','FBI','NASA','Vatican','Illuminati','Freemason','Rothschild',
+        'Rockefeller','Bilderberg','5G','HAARP','MKUltra','Deep State','New World Order',
+        'Satellite','Government','Military','Secret','Classified','Operation',
+        'Cover-Up','Experiment','Surveillance','Mind Control','Conspiracy',
+        'Agent','Shadow','Elite','Cabal','Protocol','Agenda','Code',
+        'Suppressed','Forbidden','Hidden','Ancient','Underground','Bunker',
+    ];
+
+    function showTheoryTags(word, theory) {
+        theoryTagsEl.innerHTML = '';
+        const upperTheory = theory.toUpperCase();
+        const upperWord = word.toUpperCase();
+
+        // Always add the main keyword as first chip
+        const mainTag = makeTag(upperWord, () => {
+            wordInput.value = upperWord;
+        });
+        theoryTagsEl.appendChild(mainTag);
+
+        // Find seed keywords that appear in the theory
+        const found = TAG_SEEDS.filter(k => upperTheory.includes(k.toUpperCase())).slice(0, 5);
+        found.forEach((kw, i) => {
+            const tag = makeTag(kw, () => {
+                wordInput.value = kw;
+                wordInput.dispatchEvent(new Event('input'));
+            });
+            tag.style.animationDelay = (i * 0.07 + 0.1) + 's';
+            theoryTagsEl.appendChild(tag);
+        });
+    }
+
+    function makeTag(label, onClick) {
+        const tag = document.createElement('span');
+        tag.className = 'theory-tag';
+        tag.textContent = '# ' + label;
+        tag.title = `Decrypt: ${label}`;
+        tag.addEventListener('click', (e) => {
+            e.stopPropagation();
+            onClick();
+        });
+        return tag;
+    }
+
+    // ============================================
+    //  COPY TO CLIPBOARD
+    // ============================================
+    async function handleCopy() {
+        const text = theoryText.textContent;
+        const word = theoryWord.textContent;
+        if (!text) return;
+
+        try {
+            await navigator.clipboard.writeText(`${word}\n\n${text}\n\n— conspiracy-eight.vercel.app`);
+            copyIcon.textContent = '✅';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyIcon.textContent = '📋';
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        } catch (e) {
+            // Fallback: select text
+            const range = document.createRange();
+            range.selectNodeContents(theoryText);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+        }
+    }
+
     // --- Start ---
     init();
+    updateHistoryBadge();
 })();
